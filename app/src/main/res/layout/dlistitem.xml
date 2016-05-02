@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <TextView android:id="@+id/piaohao"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="票号"
+        android:gravity="center"
+        android:textSize="20dp"
+        android:background="@drawable/textview"
+        />
+
+    <TextView android:id="@+id/time"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="导入时间"
+        android:gravity="center"
+        android:textSize="20dp"
+        android:background="@drawable/textview"
+        />
+    <TextView android:id="@+id/status"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="状态"
+        android:gravity="center"
+        android:textSize="20dp"
+        android:background="@drawable/textview"
+        />
+</LinearLayout>

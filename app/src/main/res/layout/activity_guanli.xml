@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFF0F5">
+    <include android:id="@+id/head" layout="@layout/header"></include>
+    <ScrollView
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+        >
+        <LinearLayout
+            android:id="@+id/content1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            >
+
+        <RadioGroup
+            android:id="@+id/content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="horizontal"
+
+            >
+            <RadioButton
+                android:layout_width="100dp"
+                android:layout_height="40dp"
+                android:text="同步上传"
+                android:id="@+id/upload"
+
+                android:layout_marginTop="20dp"
+                android:paddingTop="10dp"
+                android:background="@drawable/radiobutton"
+                android:checked="true"
+               style="@style/main_tab"
+
+                />
+            <RadioButton
+                android:layout_width="100dp"
+                android:layout_height="40dp"
+                android:text="下载"
+                android:id="@+id/download"
+                android:layout_marginTop="20dp"
+               android:paddingTop="10dp"
+                android:background="@drawable/radiobutton"
+                style="@style/main_tab"
+
+                />
+            <RadioButton
+                android:layout_width="100dp"
+                android:layout_height="40dp"
+                android:text="设置"
+                android:id="@+id/shezhi"
+                android:layout_marginTop="20dp"
+                android:paddingTop="10dp"
+                android:background="@drawable/radiobutton"
+                style="@style/main_tab"
+
+                />
+
+        </RadioGroup>
+        <LinearLayout
+            android:id="@+id/nei"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            >
+            <fragment
+                android:id="@+id/fragement_shangchuan"
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:name="com.zjl.checkticket.activity.JianPiaoFragment"
+                tools:layout="@layout/ufragment" />
+
+            <fragment
+                android:id="@+id/fragement_dowload"
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:name="com.zjl.checkticket.activity.ErCiFragment"
+                tools:layout="@layout/dfragment" />
+            <fragment
+                android:id="@+id/fragement_shezhi"
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:name="com.zjl.checkticket.activity.ErCiFragment"
+                tools:layout="@layout/shezhifragment" />
+        </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

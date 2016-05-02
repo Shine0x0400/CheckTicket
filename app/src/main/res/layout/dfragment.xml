@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="已导入门票数量及详细信息显示"
+        android:id="@+id/xinxi"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/textview"
+        />
+    <LinearLayout
+        android:id="@+id/list_head"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp"
+        >
+        <TextView android:id="@+id/piaohao"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="票号"
+            android:gravity="center"
+            android:textSize="20dp"
+            android:background="@drawable/textview"
+            />
+
+        <TextView android:id="@+id/time"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="导入时间"
+            android:gravity="center"
+            android:textSize="20dp"
+            android:background="@drawable/textview"
+            />
+        <TextView android:id="@+id/status"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="状态"
+            android:gravity="center"
+            android:textSize="20dp"
+            android:background="@drawable/textview"
+            />
+
+
+    </LinearLayout>
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:id="@+id/list"
+        />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginLeft="190dp"
+        android:text="下一页"
+        android:textSize="18dp"
+        android:id="@+id/button"
+        android:background="@drawable/button"
+
+        android:layout_gravity="end"
+        />
+
+</LinearLayout>

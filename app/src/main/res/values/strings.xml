@@ -13,4 +13,6 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+    <string name="title_activity_test">TestActivity</string>
+    <string name="scan_text">将二维码放入框内, 即可自动扫描</string>
 </resources>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <include android:id="@+id/head" layout="@layout/header"></include>
+    <ScrollView
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    >
+    <LinearLayout
+        android:id="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        >
+        <Button
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="检票"
+            android:id="@+id/check"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="100dp"
+            android:background="#36648B"
+            android:textColor="#ffffff"
+            />
+        <Button
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="统计"
+            android:id="@+id/tongji"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="50dp"
+            android:background="#4F94CD" />
+        <Button
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="系统管理"
+            android:id="@+id/guanli"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="50dp"
+            android:background="#36648B"
+            android:textColor="#ffffff"/>
+    </LinearLayout>
+</ScrollView>
+</LinearLayout>
