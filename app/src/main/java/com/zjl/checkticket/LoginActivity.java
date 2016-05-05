@@ -137,7 +137,7 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
                     if (!response.isSuccessful()) {
-//                        throw new IOException("Unexpected code " + response);
+                        throw new IOException("Unexpected code " + response);
                     }
 
                     runOnUiThread(new Runnable() {

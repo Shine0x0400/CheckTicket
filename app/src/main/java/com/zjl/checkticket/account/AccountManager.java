@@ -45,12 +45,12 @@ public class AccountManager {
     }
 
     static class LoginParamsModel {
-        String name;
-        String pwd;
+        String username;
+        String password;
 
         public LoginParamsModel(String name, String pwd) {
-            this.name = name;
-            this.pwd = pwd;
+            this.username = name;
+            this.password = pwd;
         }
     }
 
