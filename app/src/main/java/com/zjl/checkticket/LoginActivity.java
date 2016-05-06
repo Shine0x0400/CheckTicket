@@ -1,8 +1,14 @@
 package com.zjl.checkticket;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
+import com.zjl.checkticket.account.AccountManager;
+import com.zjl.checkticket.http.ResponseBodyModel;
+
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,8 +23,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-
-import com.zjl.checkticket.account.AccountManager;
+import android.widget.Toast;
 
 import java.io.IOException;
 
@@ -125,11 +130,9 @@ public class LoginActivity extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-
                             showProgress(false);
-
-                            mPasswordView.setError(getString(R.string.error_incorrect_password));
-                            mPasswordView.requestFocus();
+                            Toast.makeText(getApplicationContext(), R.string.login_response_failure,
+                                    Toast.LENGTH_LONG).show();
                         }
                     });
                 }
@@ -137,22 +140,50 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
                     if (!response.isSuccessful()) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                showProgress(false);
+                                Toast.makeText(getApplicationContext(),
+                                        R.string.login_response_failure, Toast.LENGTH_LONG).show();
+                            }
+                        });
                         throw new IOException("Unexpected code " + response);
                     }
 
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            showProgress(false);
-                        }
-                    });
+
 
                     Headers responseHeaders = response.headers();
                     for (int i = 0, size = responseHeaders.size(); i < size; i++) {
                         Log.d(TAG, "onResponse: headers=" + responseHeaders.name(i) + ": " + responseHeaders.value(i));
                     }
 
-                    Log.d(TAG, "onResponse: body=" + response.body().string());
+                    String bodyString = response.body().string();
+                    Log.d(TAG, "onResponse: body=" + bodyString);
+
+                    final ResponseBodyModel<Boolean> model = JSON.parseObject(bodyString,
+                            new TypeReference<ResponseBodyModel<Boolean>>() {
+                    });
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            showProgress(false);
+
+                            if (model.getData()) {
+                                Log.d(TAG, "run: login success");
+                                startActivity(
+                                        new Intent(LoginActivity.this, SettingsActivity.class));
+                                finish();
+
+                            } else {
+                                mPasswordView
+                                        .setError(getString(R.string.error_incorrect_password));
+                                mPasswordView.requestFocus();
+                            }
+                        }
+                    });
+
                 }
             });
         }
