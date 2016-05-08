@@ -8,8 +8,54 @@
     <RelativeLayout
         android:layout_width="300dp"
         android:layout_height="150dp"
-        android:background="#2ec23a"
-        android:layout_marginTop="92dp"
+        android:background="@color/check_pass_bg"
+        android:layout_marginTop="53dp"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"></RelativeLayout>
+        android:layout_centerHorizontal="true"
+        android:id="@+id/result_layout">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="40sp"
+            android:textColor="@color/check_pass_text"
+            android:text="@string/check_pass"
+            android:id="@+id/result_txt"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true" />
+    </RelativeLayout>
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/ticket_id_edit"
+        android:layout_below="@+id/result_layout"
+        android:layout_marginTop="65dp"
+        android:layout_alignLeft="@+id/result_layout"
+        android:layout_alignStart="@+id/result_layout"
+        android:layout_alignRight="@+id/result_layout"
+        android:layout_alignEnd="@+id/result_layout"
+        android:singleLine="true"
+        android:text="scenery3dPZ010000000033"
+        android:hint="输入待验票号" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="检票"
+        android:id="@+id/check_btn"
+        android:layout_below="@+id/ticket_id_edit"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="25dp"
+        android:textSize="20sp" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="设置"
+        android:id="@+id/setting_btn"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 </RelativeLayout>

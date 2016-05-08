@@ -1,6 +1,7 @@
 package com.zjl.checkticket.account;
 
 import com.alibaba.fastjson.JSONObject;
+import com.zjl.checkticket.http.HttpClient;
 import com.zjl.checkticket.http.HttpConstants;
 
 import java.io.IOException;
@@ -33,7 +34,6 @@ public class AccountManager {
     }
 
     public void login(String username, String password, final Callback callback) {
-        OkHttpClient httpClient = new OkHttpClient();
 
         StringBuilder url = new StringBuilder(HttpConstants.HOST_NAME);
         url.append(HttpConstants.URL_PATH_LOG_IN);
@@ -45,7 +45,7 @@ public class AccountManager {
                 .post(RequestBody.create(HttpConstants.MEDIA_TYPE_JSON, jsonBody))
                 .build();
 
-        httpClient.newCall(request).enqueue(new Callback() {
+        HttpClient.getOkHttpClient().newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 callback.onFailure(call, e);

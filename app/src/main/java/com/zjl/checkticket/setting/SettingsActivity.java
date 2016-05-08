@@ -1,9 +1,9 @@
-package com.zjl.checkticket;
+package com.zjl.checkticket.setting;
 
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -18,9 +18,22 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.MenuItem;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
+import com.zjl.checkticket.R;
+import com.zjl.checkticket.TicketDataManager;
+import com.zjl.checkticket.model.Park;
+
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
@@ -156,43 +169,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      */
     protected boolean isValidFragment(String fragmentName) {
         return PreferenceFragment.class.getName().equals(fragmentName)
-                || GeneralPreferenceFragment.class.getName().equals(fragmentName)
                 || DataSyncPreferenceFragment.class.getName().equals(fragmentName)
                 || NotificationPreferenceFragment.class.getName().equals(fragmentName);
     }
 
     /**
-     * This fragment shows general preferences only. It is used when the
-     * activity is showing a two-pane settings UI.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class GeneralPreferenceFragment extends PreferenceFragment {
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.pref_general);
-            setHasOptionsMenu(true);
-
-            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
-            // to their values. When their values change, their summaries are
-            // updated to reflect the new value, per the Android Design
-            // guidelines.
-            bindPreferenceSummaryToValue(findPreference("example_text"));
-            bindPreferenceSummaryToValue(findPreference("example_list"));
-        }
-
-        @Override
-        public boolean onOptionsItemSelected(MenuItem item) {
-            int id = item.getItemId();
-            if (id == android.R.id.home) {
-                startActivity(new Intent(getActivity(), SettingsActivity.class));
-                return true;
-            }
-            return super.onOptionsItemSelected(item);
-        }
-    }
-
-    /**
+     * /**
      * This fragment shows notification preferences only. It is used when the
      * activity is showing a two-pane settings UI.
      */
@@ -215,7 +197,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         public boolean onOptionsItemSelected(MenuItem item) {
             int id = item.getItemId();
             if (id == android.R.id.home) {
-                startActivity(new Intent(getActivity(), SettingsActivity.class));
+                if (getActivity() != null) {
+                    getActivity().getFragmentManager().beginTransaction().remove(this).commit();
+                    getActivity().finish();
+                }
                 return true;
             }
             return super.onOptionsItemSelected(item);
@@ -227,28 +212,158 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      * activity is showing a two-pane settings UI.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class DataSyncPreferenceFragment extends PreferenceFragment {
+    public static class DataSyncPreferenceFragment extends PreferenceFragment implements Observer {
+        private static final String TAG = "DataSyncPreference";
+        public static final String PARKS_PREFERENCE_NAME = "park_list";
+
+        static class ParksPreferenceModel {
+            private CharSequence[] entries;
+            private CharSequence[] values;
+
+            public ParksPreferenceModel() {
+            }
+
+            public ParksPreferenceModel(CharSequence[] entries, CharSequence[] values) {
+                this.values = values;
+                this.entries = entries;
+            }
+
+            public CharSequence[] getEntries() {
+                return entries;
+            }
+
+            public void setEntries(CharSequence[] entries) {
+                this.entries = entries;
+            }
+
+            public CharSequence[] getValues() {
+                return values;
+            }
+
+            public void setValues(CharSequence[] values) {
+                this.values = values;
+            }
+        }
+
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_data_sync);
             setHasOptionsMenu(true);
 
+            TicketDataManager.getInstance().addObserver(this);
+
             // Bind the summaries of EditText/List/Dialog/Ringtone preferences
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
             bindPreferenceSummaryToValue(findPreference("sync_frequency"));
+
+            ListPreference parkPref = (ListPreference) findPreference("selected_park");
+
+            if (parkPref.getEntries() == null) {
+                Log.i(TAG, "onCreate: park preference is null");
+
+//                ParksPreferenceModel model = readParksFromSharedPreference();
+//                if (model != null) {
+//                    parkPref.setEntries(model.getEntries());
+//                    parkPref.setEntryValues(model.getValues());
+//                }
+
+                if (parkPref.getEntries() == null) {
+                    parkPref.setEnabled(false);
+                    TicketDataManager.getInstance().fetchParks();
+                    Log.i(TAG, "onCreate: fetch parks from server");
+                } else {
+                    parkPref.setEnabled(true);
+                    bindPreferenceSummaryToValue(parkPref);
+                }
+            }
+
+        }
+
+        @Override
+        public void onDestroy() {
+            super.onDestroy();
+            TicketDataManager.getInstance().deleteObserver(this);
         }
 
         @Override
         public boolean onOptionsItemSelected(MenuItem item) {
             int id = item.getItemId();
             if (id == android.R.id.home) {
-                startActivity(new Intent(getActivity(), SettingsActivity.class));
+                if (getActivity() != null) {
+                    getActivity().getFragmentManager().beginTransaction().remove(this).commit();
+                    getActivity().finish();
+                }
                 return true;
             }
             return super.onOptionsItemSelected(item);
+        }
+
+        @Override
+        public void update(Observable observable, Object data) {
+            if (observable == TicketDataManager.getInstance()) {
+                TicketDataManager.MessageBundle message = (TicketDataManager.MessageBundle) data;
+                TicketDataManager.MessageType type = message.getType();
+                Log.d(TAG, "update: " + type);
+
+                if (type.equals(TicketDataManager.MessageType.PARKS_DATA_CHANGED)) {
+                    ArrayList<Park> parks = (ArrayList<Park>) message.getEntity();
+
+                    if (parks != null && !parks.isEmpty()) {
+                        final ListPreference parkPref = (ListPreference) findPreference("selected_park");
+                        final CharSequence[] entries = new CharSequence[parks.size()];
+                        final CharSequence[] values = new CharSequence[parks.size()];
+                        synchronized (TicketDataManager.SYNCHRONIZE_LOCK_PARKS) {
+                            int idx = 0;
+                            for (Park park : parks) {
+                                entries[idx] = park.getName();
+                                values[idx] = park.getId();
+                                idx++;
+                            }
+                        }
+
+                        Activity activity = getActivity();
+                        if (activity != null) {
+                            activity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    parkPref.setEntries(entries);
+                                    parkPref.setEntryValues(values);
+
+                                    parkPref.setEnabled(true);
+                                    bindPreferenceSummaryToValue(parkPref);
+                                }
+                            });
+                        }
+
+//                        writeParksToSharedPreference(new ParksPreferenceModel(entries, values));
+                    }
+
+                }
+            }
+        }
+
+        private void writeParksToSharedPreference(ParksPreferenceModel model) {
+            String parksJson = JSON.toJSONString(model);
+            getActivity().getPreferences(Context.MODE_PRIVATE).edit().putString(PARKS_PREFERENCE_NAME, parksJson).commit();
+        }
+
+        private ParksPreferenceModel readParksFromSharedPreference() {
+            ParksPreferenceModel model = null;
+            String parksJson = getActivity().getPreferences(Context.MODE_PRIVATE).getString(PARKS_PREFERENCE_NAME, null);
+
+            if (parksJson != null) {
+                Log.d(TAG, "readParksFromSharedPreference: parksJson = " + parksJson);
+                try {
+                    model = JSON.parseObject(parksJson, ParksPreferenceModel.class);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return model;
         }
     }
 }

@@ -3,4 +3,9 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+    <color name="check_pass_bg">#2ec23a</color>
+    <color name="check_fail_bg">#ff0000</color>
+    <color name="check_pass_text">#FFF</color>
+    <color name="check_fail_text">#000</color>
 </resources>

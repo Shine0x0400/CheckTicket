@@ -4,14 +4,17 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.zjl.checkticket.account.AccountManager;
 import com.zjl.checkticket.http.ResponseBodyModel;
+import com.zjl.checkticket.setting.SettingsActivity;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -138,7 +141,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onResponse(Call call, Response response) throws IOException {
+                public void onResponse(Call call, final Response response) throws IOException {
                     if (!response.isSuccessful()) {
                         runOnUiThread(new Runnable() {
                             @Override
@@ -151,19 +154,14 @@ public class LoginActivity extends AppCompatActivity {
                         throw new IOException("Unexpected code " + response);
                     }
 
-
-
-                    Headers responseHeaders = response.headers();
-                    for (int i = 0, size = responseHeaders.size(); i < size; i++) {
-                        Log.d(TAG, "onResponse: headers=" + responseHeaders.name(i) + ": " + responseHeaders.value(i));
-                    }
+                    Log.d(TAG, "onResponse: response=" + response);
 
                     String bodyString = response.body().string();
                     Log.d(TAG, "onResponse: body=" + bodyString);
 
                     final ResponseBodyModel<Boolean> model = JSON.parseObject(bodyString,
                             new TypeReference<ResponseBodyModel<Boolean>>() {
-                    });
+                            });
 
                     runOnUiThread(new Runnable() {
                         @Override
@@ -172,10 +170,21 @@ public class LoginActivity extends AppCompatActivity {
 
                             if (model.getData()) {
                                 Log.d(TAG, "run: login success");
-                                startActivity(
-                                        new Intent(LoginActivity.this, SettingsActivity.class));
-                                finish();
 
+                                startActivity(
+                                        new Intent(LoginActivity.this, CheckTicketActivity.class));
+
+                                SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                                String parkId = sharedPref.getString(CheckTicketApplication.SELECTED_PARK_PREFERENCE, "");
+
+                                if (!TextUtils.isEmpty(parkId)) {
+                                    Log.i(TAG, "Login success: parkId=" + parkId + ", init fetch tickets procedure");
+                                    TicketDataManager.getInstance().setCurrentParkId(parkId);
+                                    TicketDataManager.getInstance().fetchCurrentParkTickets();
+                                }
+
+
+                                finish();
                             } else {
                                 mPasswordView
                                         .setError(getString(R.string.error_incorrect_password));

@@ -12,4 +12,18 @@ public class ExampleUnitTest {
     public void addition_isCorrect() throws Exception {
         assertEquals(4, 2 + 2);
     }
+
+    @Test
+    public void doFetchParks() {
+        System.out.println(TicketDataManager.getInstance().getParks());
+        TicketDataManager.getInstance().fetchParks();
+        System.out.println(TicketDataManager.getInstance().getParks());
+    }
+
+    @Test
+    public void doFetchParkTickets() {
+        System.out.println(TicketDataManager.getInstance().getParkTickets());
+        TicketDataManager.getInstance().fetchCurrentParkTickets();
+        System.out.println(TicketDataManager.getInstance().getParkTickets());
+    }
 }

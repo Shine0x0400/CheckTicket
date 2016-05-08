@@ -1,4 +1,4 @@
-package com.zjl.checkticket;
+package com.zjl.checkticket.setting;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
