@@ -1,11 +1,5 @@
 package com.zjl.checkticket;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
-import com.zjl.checkticket.account.AccountManager;
-import com.zjl.checkticket.http.ResponseBodyModel;
-import com.zjl.checkticket.setting.SettingsActivity;
-
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
@@ -28,11 +22,15 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
+import com.zjl.checkticket.account.AccountManager;
+import com.zjl.checkticket.http.ResponseBodyModel;
+
 import java.io.IOException;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.Headers;
 import okhttp3.Response;
 
 /**
