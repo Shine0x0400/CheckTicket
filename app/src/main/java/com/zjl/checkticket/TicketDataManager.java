@@ -6,6 +6,8 @@ import android.util.Log;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.TypeReference;
+import com.zjl.checkticket.db.CheckTicketContract;
+import com.zjl.checkticket.db.CheckTicketDAO;
 import com.zjl.checkticket.http.CommonCallback;
 import com.zjl.checkticket.http.ResponseBodyModel;
 import com.zjl.checkticket.http.requests.GetParkTicketsRequest;
@@ -92,6 +94,8 @@ public class TicketDataManager extends Observable {
         new GetParkTicketsRequest(mCurrentParkId).enqueueRequest(new CommonCallback() {
             @Override
             public void handleSuccess(Call call, Response response) throws IOException {
+                // TODO: 2016/5/12 need to check if this response still valid for current park id.
+
                 String bodyString = response.body().string();
                 Log.d(TAG, "onResponse: body=" + bodyString);
 
@@ -101,8 +105,16 @@ public class TicketDataManager extends Observable {
                         });
 
                 synchronized (SYNCHRONIZE_LOCK_PARK_TICKETS) {
+                    List<String> ticketIds = Arrays.asList(model.getData().toArray(new String[model.getData().size()]));
                     parkTickets.clear();
-                    parkTickets.addAll(Arrays.asList(model.getData().toArray(new String[model.getData().size()])));
+                    parkTickets.addAll(ticketIds);
+
+                    ArrayList<Ticket> tickets = new ArrayList<Ticket>();
+                    for (String id : parkTickets) {
+                        Ticket t = new Ticket(id, CheckTicketContract.CheckTicketEntry.VALUE_IS_NOT_CHECKTED, System.currentTimeMillis());
+                        tickets.add(t);
+                    }
+                    new CheckTicketDAO().updateTableWithFreshData(tickets);
                 }
             }
         });

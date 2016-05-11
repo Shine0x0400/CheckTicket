@@ -14,8 +14,12 @@ public final class CheckTicketContract {
     /* Inner class that defines the table contents */
     public static abstract class CheckTicketEntry implements BaseColumns {
         public static final String TABLE_NAME = "check_ticket_table";
+
         public static final String COLUMN_TICKET_ID = "ticket_id";
         public static final String COLUMN_FIRST_CHECK_TIME = "first_check_time";
         public static final String COLUMN_IS_CHECKED = "is_checked";
+
+        public static final String VALUE_IS_CHECKTED = "1";
+        public static final String VALUE_IS_NOT_CHECKTED = "0";
     }
 }

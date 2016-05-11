@@ -1,6 +1,7 @@
 package com.zjl.checkticket;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
@@ -14,10 +15,13 @@ public class CheckTicketApplication extends Application implements SharedPrefere
     private static final String TAG = "CheckTicketApplication";
     public static final String SELECTED_PARK_PREFERENCE = "selected_park";
 
+    public static Context sApplicationContext;
+
     @Override
     public void onCreate() {
         Log.i(TAG, "onCreate: --- ");
         super.onCreate();
+        sApplicationContext = this;
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 //        String parkId = sharedPref.getString(SELECTED_PARK_PREFERENCE, "");
@@ -37,6 +41,8 @@ public class CheckTicketApplication extends Application implements SharedPrefere
     public void onTerminate() {
         Log.i(TAG, "onTerminate: --- ");
         super.onTerminate();
+        sApplicationContext = null;
+
         PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this);
     }
 

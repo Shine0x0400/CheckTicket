@@ -49,6 +49,7 @@ public class CheckTicketActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate: ");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_check_ticket);
 
@@ -60,6 +61,7 @@ public class CheckTicketActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
+        Log.d(TAG, "onResume: ");
         super.onResume();
 
         registerReceiver(mScanReceiver, mScanFilter);
@@ -67,9 +69,16 @@ public class CheckTicketActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
+        Log.d(TAG, "onPause: ");
         super.onPause();
 
         unregisterReceiver(mScanReceiver);
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.d(TAG, "onDestroy: ");
+        super.onDestroy();
     }
 
     private void initScan() {
