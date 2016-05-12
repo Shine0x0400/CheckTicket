@@ -1,6 +1,11 @@
 package com.zjl.checkticket.setting;
 
 
+import com.alibaba.fastjson.JSON;
+import com.zjl.checkticket.R;
+import com.zjl.checkticket.TicketDataManager;
+import com.zjl.checkticket.model.Park;
+
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
@@ -13,23 +18,14 @@ import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.support.v7.app.ActionBar;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
+import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
-import com.zjl.checkticket.R;
-import com.zjl.checkticket.TicketDataManager;
-import com.zjl.checkticket.model.Park;
-
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;

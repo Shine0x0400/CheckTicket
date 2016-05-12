@@ -1,21 +1,25 @@
 package com.zjl.checkticket;
 
+import com.zjl.checkticket.setting.SettingsActivity;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import com.zjl.checkticket.setting.SettingsActivity;
 
 /**
  * 检票界面，显示检票结果；
@@ -49,9 +53,12 @@ public class CheckTicketActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "onCreate: ");
+        Log.i(TAG, "onCreate: ");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_check_ticket);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         initResources();
         initWidgets();
@@ -77,7 +84,7 @@ public class CheckTicketActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        Log.d(TAG, "onDestroy: ");
+        Log.i(TAG, "onDestroy: ");
         super.onDestroy();
     }
 
@@ -137,15 +144,42 @@ public class CheckTicketActivity extends AppCompatActivity {
                 updateResultUI(TicketUtil.getInstance().checkValidity(mTicketId));
             }
         });
+    }
 
-        Button settingBtn = (Button) findViewById(R.id.setting_btn);
-        settingBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(CheckTicketActivity.this, SettingsActivity.class);
-                startActivity(intent);
-            }
-        });
+    private void gotoSettings() {
+        Intent intent = new Intent(CheckTicketActivity.this, SettingsActivity.class);
+        startActivity(intent);
+    }
+
+    private void gotoStatistics() {
+        // Intent intent = new Intent(CheckTicketActivity.this, SettingsActivity.class);
+        Intent intent = new Intent(CheckTicketActivity.this, DrawerActivity.class);
+        startActivity(intent);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.activity_checkticket_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case R.id.action_settings:
+            gotoSettings();
+            return true;
+
+        case R.id.action_statistics:
+            gotoStatistics();
+            return true;
+
+        default:
+            // If we got here, the user's action was not recognized.
+            // Invoke the superclass to handle it.
+            return super.onOptionsItemSelected(item);
+
+        }
     }
 
     private void updateResultUI(boolean checkResult) {
@@ -153,5 +187,11 @@ public class CheckTicketActivity extends AppCompatActivity {
         mResultText.setTextColor(checkResult ? mCheckPassTextColor : mCheckFailTextColor);
 
         mResultText.setText(checkResult ? mCheckPassSentence : mCheckFailSentence);
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Log.i(TAG, "onConfigurationChanged: ");
     }
 }
