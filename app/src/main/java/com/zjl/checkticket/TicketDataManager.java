@@ -34,12 +34,13 @@ public class TicketDataManager extends Observable {
     public static final String SYNCHRONIZE_LOCK_PARKS = "synchronize_lock_parks";
     public static final String SYNCHRONIZE_LOCK_PARK_TICKETS = "synchronize_lock_park_tickets";
 
-    private static TicketDataManager manager;
+    private static volatile TicketDataManager manager;
 
     private String mCurrentParkId;
 
 
     private final ArrayList<Park> parks = new ArrayList<>();
+
 
     private final ArrayList<String> parkTickets = new ArrayList<>();
 
@@ -111,13 +112,18 @@ public class TicketDataManager extends Observable {
 
                     ArrayList<Ticket> tickets = new ArrayList<Ticket>();
                     for (String id : parkTickets) {
-                        Ticket t = new Ticket(id, CheckTicketContract.CheckTicketEntry.VALUE_IS_NOT_CHECKTED, System.currentTimeMillis());
+                        // TODO: 2016/5/13 mock
+                        Ticket t = new Ticket(id, CheckTicketContract.CheckTicketEntry.VALUE_IS_NOT_CHECKED, System.currentTimeMillis());
                         tickets.add(t);
                     }
-                    new CheckTicketDAO().updateTableWithFreshData(tickets);
+                    CheckTicketDAO.getInstance().updateTableWithFreshData(tickets);
                 }
             }
         });
+    }
+
+    public void uploadCheckedTickets() {
+
     }
 
     public void setCurrentParkId(String parkId) {

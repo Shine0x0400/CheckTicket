@@ -25,9 +25,9 @@ public class TicketDbHelper extends SQLiteOpenHelper {
     public static final String SQL_CREATE_CHECK_TICKET_TABLE =
             "CREATE TABLE " + CheckTicketEntry.TABLE_NAME + " (" +
                     CheckTicketEntry._ID + " INTEGER PRIMARY KEY" + COMMA_SEP +
-                    CheckTicketEntry.COLUMN_TICKET_ID + TYPE_TEXT + COMMA_SEP +
-                    CheckTicketEntry.COLUMN_IS_CHECKED + TYPE_TEXT + COMMA_SEP +
-                    CheckTicketEntry.COLUMN_FIRST_CHECK_TIME + TYPE_LONG +
+                    CheckTicketEntry.COLUMN_TICKET_ID + TYPE_TEXT + " NOT NULL UNIQUE" + COMMA_SEP +
+                    CheckTicketEntry.COLUMN_IS_CHECKED + TYPE_TEXT + " DEFAULT \"0\"" + COMMA_SEP +
+                    CheckTicketEntry.COLUMN_FIRST_CHECK_TIME + TYPE_LONG + " DEFAULT -1" +
                     // Any other options for the CREATE command
                     ")";
 
