@@ -1,5 +1,7 @@
 package com.zjl.checkticket;
 
+import com.zjl.checkticket.check.HistoryAdapter;
+import com.zjl.checkticket.check.HistoryModel;
 import com.zjl.checkticket.setting.SettingsActivity;
 
 import android.content.BroadcastReceiver;
@@ -8,18 +10,28 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * 检票界面，显示检票结果；
@@ -32,11 +44,19 @@ public class CheckTicketActivity extends AppCompatActivity {
     private static final String SCAN_STATUS_OK = "ok";
     private static final String SCAN_STATUS_FAIL = "fail";
 
+    // widgets
     private Button mCheckBtn;
-    private EditText mTicketIdTxt;
     private RelativeLayout mResultLayout;
-    private TextView mResultText;
+    private ImageView mResultImg;
+    private TextView mResultTv;
+    private TextView mTicketIdTv;
+    private TextView mTimeTv;
+    private ProgressBar mProgressBar;
+    private RecyclerView mHistoryRecycler;
 
+    private HistoryAdapter mAdapter;
+
+    // resources
     private int mCheckPassBgColor;
     private int mCheckFailBgColor;
     private int mCheckPassTextColor;
@@ -45,7 +65,12 @@ public class CheckTicketActivity extends AppCompatActivity {
     private String mCheckPassSentence;
     private String mCheckFailSentence;
 
-    private String mTicketId;
+    // last ticket that passed the check
+    private String mLastPassedTicketId;
+
+    private ArrayList<HistoryModel> historyRecords = new ArrayList<>();
+
+    SimpleDateFormat resultSdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
 
     // scan
     private BroadcastReceiver mScanReceiver;
@@ -100,9 +125,13 @@ public class CheckTicketActivity extends AppCompatActivity {
 
                 Log.i(TAG, "scanResult = " + scanResult + ", scanStatus = " + scanStatus);
 
-                if (SCAN_STATUS_OK.equals(scanStatus)) {
-                    mTicketIdTxt.setText(scanResult);
-                    updateResultUI(TicketUtil.getInstance().checkValidity(scanResult));
+                if (SCAN_STATUS_OK.equals(scanStatus) && !TextUtils.isEmpty(scanResult)) {
+                    long time = System.currentTimeMillis();
+
+                    mTicketIdTv.setText(scanResult);
+                    mTimeTv.setText(resultSdf.format(new Date(time)));
+
+                    new CheckTicketTask(scanResult, time).execute(scanResult);
                 }
             }
         };
@@ -131,17 +160,25 @@ public class CheckTicketActivity extends AppCompatActivity {
 
     private void initWidgets() {
         mResultLayout = (RelativeLayout) findViewById(R.id.result_layout);
-        mResultText = (TextView) mResultLayout.findViewById(R.id.result_txt);
+        mResultImg = (ImageView) mResultLayout.findViewById(R.id.check_img);
+        mResultTv = (TextView) mResultLayout.findViewById(R.id.result_txt);
+        mTicketIdTv = (TextView) mResultLayout.findViewById(R.id.ticket_id_txt);
+        mTimeTv = (TextView) mResultLayout.findViewById(R.id.time_txt);
+        mProgressBar = (ProgressBar) mResultLayout.findViewById(R.id.check_pb);
+        mHistoryRecycler = (RecyclerView) findViewById(R.id.history_recycler);
 
-        mTicketIdTxt = (EditText) findViewById(R.id.ticket_id_edit);
+        mAdapter = new HistoryAdapter();
+        mAdapter.setHistoryRecords(historyRecords);
+        mHistoryRecycler.setAdapter(mAdapter);
+        mHistoryRecycler.setLayoutManager(new LinearLayoutManager(this));
+        mAdapter.notifyDataSetChanged();
+
         mCheckBtn = (Button) findViewById(R.id.check_btn);
 
         mCheckBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mTicketId = mTicketIdTxt.getText().toString();
-
-                updateResultUI(TicketUtil.getInstance().checkValidity(mTicketId));
+                new CheckTicketTask("456", 8).execute("456");
             }
         });
     }
@@ -178,20 +215,75 @@ public class CheckTicketActivity extends AppCompatActivity {
             // If we got here, the user's action was not recognized.
             // Invoke the superclass to handle it.
             return super.onOptionsItemSelected(item);
-
         }
     }
 
     private void updateResultUI(boolean checkResult) {
-        mResultLayout.setBackgroundColor(checkResult ? mCheckPassBgColor : mCheckFailBgColor);
-        mResultText.setTextColor(checkResult ? mCheckPassTextColor : mCheckFailTextColor);
+        mResultImg.setBackgroundResource(
+                checkResult ? R.drawable.check_success : R.drawable.check_fail);
 
-        mResultText.setText(checkResult ? mCheckPassSentence : mCheckFailSentence);
+        // mResultLayout.setBackgroundColor(checkResult ? mCheckPassBgColor : mCheckFailBgColor);
+        mResultTv.setTextColor(checkResult ? mCheckPassTextColor : mCheckFailTextColor);
+
+        mResultTv.setText(checkResult ? mCheckPassSentence : mCheckFailSentence);
+    }
+
+    private void resetResultUI() {
+        mResultLayout.setBackgroundColor(mCheckPassBgColor);
+        mResultTv.setTextColor(mCheckPassTextColor);
+
+        mResultTv.setText("");
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         Log.i(TAG, "onConfigurationChanged: ");
+    }
+
+    class CheckTicketTask extends AsyncTask<String, Void, Boolean> {
+        private String ticketId;
+        private long time;
+
+        public CheckTicketTask(String id, long time) {
+            this.ticketId = id;
+            this.time = time;
+        }
+
+        @Override
+        protected Boolean doInBackground(String... params) {
+            String id = params[0];
+            if (TextUtils.isEmpty(id)) {
+                return false;
+            }
+
+            if (id.equals(mLastPassedTicketId)) {
+                return false;
+            } else {
+                return TicketUtil.getInstance().checkValidity(id);
+            }
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            resetResultUI();
+            mProgressBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected void onPostExecute(Boolean isPassed) {
+            super.onPostExecute(isPassed);
+            if (isPassed) {
+                mLastPassedTicketId = ticketId;
+            }
+
+            mProgressBar.setVisibility(View.GONE);
+            updateResultUI(isPassed);
+
+            historyRecords.add(0, new HistoryModel(ticketId, time, isPassed));
+            mAdapter.notifyItemInserted(0);
+            mHistoryRecycler.scrollToPosition(0);
+        }
     }
 }
