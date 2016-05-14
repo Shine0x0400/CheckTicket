@@ -1,6 +1,4 @@
-package com.zjl.checkticket.http;
-
-import android.util.Log;
+package com.zjl.checkticket.http.callbacks;
 
 import java.io.IOException;
 

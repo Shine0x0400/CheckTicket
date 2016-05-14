@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -79,6 +80,10 @@ public class LoginActivity extends AppCompatActivity {
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        // TODO: 2016/5/14 remove
+        mUsernameView.setText("app");
+        mPasswordView.setText("admin");
     }
 
     /**
@@ -173,7 +178,7 @@ public class LoginActivity extends AppCompatActivity {
                                         new Intent(LoginActivity.this, CheckTicketActivity.class));
 
                                 SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                                String parkId = sharedPref.getString(CheckTicketApplication.SELECTED_PARK_PREFERENCE, "");
+                                String parkId = sharedPref.getString(CheckTicketApplication.PREF_KEY_SELECTED_PARK, "");
 
                                 if (!TextUtils.isEmpty(parkId)) {
                                     Log.i(TAG, "Login success: parkId=" + parkId + ", init fetch tickets procedure");
@@ -181,6 +186,7 @@ public class LoginActivity extends AppCompatActivity {
                                     TicketDataManager.getInstance().fetchCurrentParkTickets();
                                 }
 
+                                TicketDataManager.getInstance().startAutoSyncTask();
 
                                 finish();
                             } else {
@@ -279,6 +285,12 @@ public class LoginActivity extends AppCompatActivity {
             mAuthTask = null;
             showProgress(false);
         }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Log.i(TAG, "onConfigurationChanged: ");
     }
 }
 

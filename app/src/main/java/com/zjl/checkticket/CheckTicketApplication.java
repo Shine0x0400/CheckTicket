@@ -13,7 +13,10 @@ import android.util.Log;
 public class CheckTicketApplication extends Application implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String TAG = "CheckTicketApplication";
-    public static final String SELECTED_PARK_PREFERENCE = "selected_park";
+
+    public static final String PREF_KEY_SYNC_FREQ = "sync_frequency";
+    public static final String PREF_KEY_SELECTED_PARK = "selected_park";
+    public static final String SYNC_FREQ_DEF_VALUE = "-1";
 
     public static Context sApplicationContext;
 
@@ -24,7 +27,7 @@ public class CheckTicketApplication extends Application implements SharedPrefere
         sApplicationContext = this;
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-//        String parkId = sharedPref.getString(SELECTED_PARK_PREFERENCE, "");
+//        String parkId = sharedPref.getString(PREF_KEY_SELECTED_PARK, "");
 //
 //        if (!TextUtils.isEmpty(parkId)) {
 //            Log.i(TAG, "onCreate: parkId=" + parkId + ", init fetch tickets procedure");
@@ -36,12 +39,13 @@ public class CheckTicketApplication extends Application implements SharedPrefere
     }
 
 
-
+    // NOTE: this callback will never be called!
     @Override
     public void onTerminate() {
         Log.i(TAG, "onTerminate: --- ");
         super.onTerminate();
         sApplicationContext = null;
+        TicketDataManager.getInstance().cancelAutoSyncTask();
 
         PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this);
     }
@@ -49,14 +53,23 @@ public class CheckTicketApplication extends Application implements SharedPrefere
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         Log.d(TAG, "onSharedPreferenceChanged: key=" + key);
-        if (key.equals(SELECTED_PARK_PREFERENCE)) {
-            String parkId = sharedPreferences.getString(SELECTED_PARK_PREFERENCE, "");
+        if (key.equals(PREF_KEY_SELECTED_PARK)) {
+            String parkId = sharedPreferences.getString(PREF_KEY_SELECTED_PARK, "");
 
             if (!TextUtils.isEmpty(parkId)) {
                 Log.i(TAG, "onSharedPreferenceChanged: parkId=" + parkId + ", restart fetch tickets procedure");
                 TicketDataManager.getInstance().setCurrentParkId(parkId);
                 TicketDataManager.getInstance().fetchCurrentParkTickets();
             }
+        } else if (key.equals(PREF_KEY_SYNC_FREQ)) {
+            int syncFreq = Integer.parseInt(sharedPreferences.getString(PREF_KEY_SYNC_FREQ, SYNC_FREQ_DEF_VALUE));
+            Log.i(TAG, "onSharedPreferenceChanged: syncFreq=" + syncFreq + ", restart auto sync task");
+
+            TicketDataManager.getInstance().cancelAutoSyncTask();
+            if (syncFreq > 0) {
+                TicketDataManager.getInstance().startAutoSyncTask();
+            }
+
         }
     }
 }

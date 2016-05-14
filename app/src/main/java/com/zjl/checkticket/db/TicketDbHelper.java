@@ -27,7 +27,8 @@ public class TicketDbHelper extends SQLiteOpenHelper {
                     CheckTicketEntry._ID + " INTEGER PRIMARY KEY" + COMMA_SEP +
                     CheckTicketEntry.COLUMN_TICKET_ID + TYPE_TEXT + " NOT NULL UNIQUE" + COMMA_SEP +
                     CheckTicketEntry.COLUMN_IS_CHECKED + TYPE_TEXT + " DEFAULT \"0\"" + COMMA_SEP +
-                    CheckTicketEntry.COLUMN_FIRST_CHECK_TIME + TYPE_LONG + " DEFAULT -1" +
+                    CheckTicketEntry.COLUMN_FIRST_CHECK_TIME + TYPE_LONG + " DEFAULT -1" + COMMA_SEP +
+                    CheckTicketEntry.COLUMN_PARK_ID + TYPE_TEXT + " NOT NULL" +
                     // Any other options for the CREATE command
                     ")";
 

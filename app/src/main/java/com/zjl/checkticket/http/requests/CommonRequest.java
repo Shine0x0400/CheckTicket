@@ -1,5 +1,6 @@
 package com.zjl.checkticket.http.requests;
 
+import com.zjl.checkticket.connectivity.NetworkUtil;
 import com.zjl.checkticket.http.HttpClient;
 
 import java.io.IOException;
@@ -21,13 +22,18 @@ public class CommonRequest {
     }
 
     public Call enqueueRequest(Callback callback) {
+        if (!NetworkUtil.getInstance().isConnected()) {
+
+            return null;
+        }
+
         Call call = HttpClient.getOkHttpClient().newCall(request);
         call.enqueue(callback);
 
         return call;
     }
 
-    public Response executeRequest(Callback callback) throws IOException {
+    public Response executeRequest() throws IOException {
         Call call = HttpClient.getOkHttpClient().newCall(request);
         Response response = call.execute();
 

@@ -1,11 +1,6 @@
 package com.zjl.checkticket.setting;
 
 
-import com.alibaba.fastjson.JSON;
-import com.zjl.checkticket.R;
-import com.zjl.checkticket.TicketDataManager;
-import com.zjl.checkticket.model.Park;
-
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
@@ -25,6 +20,11 @@ import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
+
+import com.alibaba.fastjson.JSON;
+import com.zjl.checkticket.R;
+import com.zjl.checkticket.TicketDataManager;
+import com.zjl.checkticket.model.Park;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -131,6 +131,17 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         setupActionBar();
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Log.d("SettingsActivity", "onOptionsItemSelected: ");
+        int id = item.getItemId();
+        if (id == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     /**
      * Set up the {@link android.app.ActionBar}, if the API is available.
      */
@@ -191,6 +202,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
         @Override
         public boolean onOptionsItemSelected(MenuItem item) {
+            Log.d("NotificationFragment", "onOptionsItemSelected: ");
             int id = item.getItemId();
             if (id == android.R.id.home) {
                 if (getActivity() != null) {
@@ -286,6 +298,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
         @Override
         public boolean onOptionsItemSelected(MenuItem item) {
+            Log.d("DataSyncFragment", "onOptionsItemSelected: ");
             int id = item.getItemId();
             if (id == android.R.id.home) {
                 if (getActivity() != null) {

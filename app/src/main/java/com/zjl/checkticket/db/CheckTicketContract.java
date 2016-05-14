@@ -18,6 +18,7 @@ public final class CheckTicketContract {
         public static final String COLUMN_TICKET_ID = "ticket_id";
         public static final String COLUMN_FIRST_CHECK_TIME = "first_check_time";
         public static final String COLUMN_IS_CHECKED = "is_checked";
+        public static final String COLUMN_PARK_ID = "park_id";
 
         public static final String VALUE_IS_CHECKED = "1";
         public static final String VALUE_IS_NOT_CHECKED = "0";

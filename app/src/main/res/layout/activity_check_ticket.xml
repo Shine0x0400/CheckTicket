@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                tools:context="com.zjl.checkticket.CheckTicketActivity">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.zjl.checkticket.CheckTicketActivity">
 
-    <include layout="@layout/toolbar"/>
+    <include layout="@layout/toolbar" />
 
     <RelativeLayout
-        android:layout_width="330dp"
-        android:layout_height="160dp"
-        android:layout_marginTop="25dp"
         android:id="@+id/result_layout"
+        android:layout_width="match_parent"
+        android:layout_height="160dp"
         android:layout_below="@+id/toolbar"
         android:layout_centerHorizontal="true"
-        android:background="#e8000000">
+        android:background="@color/check_pass_bg">
 
         <ImageView
             android:id="@+id/check_img"
@@ -23,41 +22,40 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp"
-            android:background="@drawable/check_success"/>
+            android:background="@drawable/check_success" />
 
         <TextView
+            android:id="@+id/result_txt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="25dp"
-            android:textColor="@color/check_pass_text"
-            android:text="@string/check_pass"
-            android:id="@+id/result_txt"
-            android:layout_marginTop="18dp"
+            android:layout_marginTop="15dp"
             android:layout_toRightOf="@+id/check_img"
-            android:textSize="30sp"/>
+            android:textColor="@color/check_pass_text"
+            android:textSize="26sp" />
 
         <TextView
             android:id="@+id/ticket_id_txt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
             android:layout_marginLeft="25dp"
             android:layout_toRightOf="@+id/check_img"
-            android:text="123456789"
+            android:ellipsize="middle"
+            android:singleLine="true"
             android:textColor="@color/check_pass_text"
-            android:layout_centerVertical="true"
-            android:textSize="36sp"/>
+            android:textSize="32sp" />
 
         <TextView
             android:id="@+id/time_txt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_marginBottom="18dp"
+            android:layout_marginBottom="10dp"
             android:layout_marginLeft="25dp"
             android:layout_toRightOf="@+id/check_img"
-            android:text="2016-01-01 11:11:11"
-            android:textColor="@color/check_pass_text"
-            android:textSize="20sp"/>
+            android:textColor="#d6d6d6"
+            android:textSize="20sp" />
 
         <ProgressBar
             android:id="@+id/check_pb"
@@ -65,7 +63,7 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
-            android:visibility="gone"/>
+            android:visibility="gone" />
     </RelativeLayout>
 
     <android.support.v7.widget.RecyclerView
@@ -78,17 +76,18 @@
         android:layout_alignStart="@+id/result_layout"
         android:layout_below="@+id/result_layout"
         android:layout_marginBottom="10dp"
-        android:layout_marginTop="15dp">
+        android:layout_marginTop="5dp">
 
     </android.support.v7.widget.RecyclerView>
 
     <Button
+        android:id="@+id/check_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="检票"
-        android:id="@+id/check_btn"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:textSize="20sp"/>
+        android:text="检票"
+        android:textSize="20sp"
+        android:visibility="gone" />
 
 </RelativeLayout>

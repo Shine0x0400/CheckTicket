@@ -1,9 +1,5 @@
 package com.zjl.checkticket;
 
-import com.zjl.checkticket.check.HistoryAdapter;
-import com.zjl.checkticket.check.HistoryModel;
-import com.zjl.checkticket.setting.SettingsActivity;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -27,6 +23,11 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.zjl.checkticket.check.HistoryAdapter;
+import com.zjl.checkticket.check.HistoryModel;
+import com.zjl.checkticket.setting.SettingsActivity;
+import com.zjl.checkticket.statistics.StatisticsActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -178,7 +179,7 @@ public class CheckTicketActivity extends AppCompatActivity {
         mCheckBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new CheckTicketTask("456", 8).execute("456");
+                new CheckTicketTask("scenery3dPZ0200000000196", 8).execute("scenery3dPZ0200000000196");
             }
         });
     }
@@ -189,8 +190,7 @@ public class CheckTicketActivity extends AppCompatActivity {
     }
 
     private void gotoStatistics() {
-        // Intent intent = new Intent(CheckTicketActivity.this, SettingsActivity.class);
-        Intent intent = new Intent(CheckTicketActivity.this, DrawerActivity.class);
+        Intent intent = new Intent(CheckTicketActivity.this, StatisticsActivity.class);
         startActivity(intent);
     }
 
@@ -203,18 +203,18 @@ public class CheckTicketActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-        case R.id.action_settings:
-            gotoSettings();
-            return true;
+            case R.id.action_settings:
+                gotoSettings();
+                return true;
 
-        case R.id.action_statistics:
-            gotoStatistics();
-            return true;
+            case R.id.action_statistics:
+                gotoStatistics();
+                return true;
 
-        default:
-            // If we got here, the user's action was not recognized.
-            // Invoke the superclass to handle it.
-            return super.onOptionsItemSelected(item);
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
         }
     }
 

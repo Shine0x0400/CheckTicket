@@ -26,10 +26,6 @@ public class TicketUtil {
         return sInstance;
     }
 
-    public boolean checkValidity(Ticket t) {
-        return false;
-    }
-
     public boolean checkValidity(String tickedId) {
         long time = System.currentTimeMillis();
         // TODO: 2016/5/13 time-consuming
@@ -46,7 +42,9 @@ public class TicketUtil {
             CheckTicketDAO.getInstance().updateTicket(ticket);
             return true;
         }
+    }
 
-//        return TicketDataManager.getInstance().getParkTickets().contains(tickedId);
+    public boolean checkValidity(Ticket t) {
+        return false;
     }
 }
