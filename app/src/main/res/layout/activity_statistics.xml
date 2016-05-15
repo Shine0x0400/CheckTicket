@@ -28,4 +28,15 @@
         android:layout_marginTop="20dp"
         android:text="立即同步"
         android:textSize="24sp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/sync_btn"
+        android:layout_marginTop="20dp"
+        android:background="#999"
+        android:gravity="center"
+        android:text="此处将来会填充本机全部的票据信息"
+        android:textColor="#F00"
+        android:textSize="40sp" />
 </RelativeLayout>
