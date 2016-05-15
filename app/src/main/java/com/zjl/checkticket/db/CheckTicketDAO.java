@@ -39,6 +39,7 @@ public class CheckTicketDAO {
     public Ticket queryTicket(String ticketId) {
         Log.i(TAG, "queryTicket: ticketId=" + ticketId);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
+
         String[] projection = {
                 CheckTicketEntry._ID,
                 CheckTicketEntry.COLUMN_TICKET_ID,
@@ -46,10 +47,6 @@ public class CheckTicketDAO {
                 CheckTicketEntry.COLUMN_FIRST_CHECK_TIME,
                 CheckTicketEntry.COLUMN_PARK_ID
         };
-
-//// How you want the results sorted in the resulting Cursor
-//        String sortOrder =
-//                CheckTicketEntry.COLUMN_NAME_UPDATED + " DESC";
 
         Cursor cursor = db.query(
                 CheckTicketEntry.TABLE_NAME,  // The table to query
@@ -86,10 +83,6 @@ public class CheckTicketDAO {
                 CheckTicketEntry.COLUMN_FIRST_CHECK_TIME,
                 CheckTicketEntry.COLUMN_PARK_ID
         };
-
-// How you want the results sorted in the resulting Cursor
-//        String sortOrder =
-//                CheckTicketEntry.COLUMN_NAME_UPDATED + " DESC";
 
         Cursor cursor = db.query(
                 CheckTicketEntry.TABLE_NAME,  // The table to query
@@ -129,9 +122,8 @@ public class CheckTicketDAO {
                 CheckTicketEntry.COLUMN_PARK_ID
         };
 
-// How you want the results sorted in the resulting Cursor
-        String sortOrder =
-                CheckTicketEntry.COLUMN_IS_CHECKED + " DESC";
+        // How you want the results sorted in the resulting Cursor
+        String sortOrder = CheckTicketEntry.COLUMN_IS_CHECKED + " DESC";
 
         Cursor cursor = db.query(
                 CheckTicketEntry.TABLE_NAME,  // The table to query
@@ -182,7 +174,8 @@ public class CheckTicketDAO {
         }
     }
 
-    public void updateTableWithFreshDataExceptChecked(ArrayList<Ticket> tickets) {
+    // NOTE: synchronize ?
+    public synchronized void updateTableWithFreshDataExceptChecked(ArrayList<Ticket> tickets) {
         Log.i(TAG, "updateTableWithFreshDataExceptChecked: ");
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 

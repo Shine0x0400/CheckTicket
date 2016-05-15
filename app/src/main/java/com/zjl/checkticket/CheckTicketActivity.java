@@ -2,6 +2,7 @@ package com.zjl.checkticket;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
@@ -9,6 +10,7 @@ import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -77,6 +79,9 @@ public class CheckTicketActivity extends AppCompatActivity {
     private BroadcastReceiver mScanReceiver;
     private IntentFilter mScanFilter;
 
+    // checking flag
+    private boolean isChecking = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.i(TAG, "onCreate: ");
@@ -121,12 +126,17 @@ public class CheckTicketActivity extends AppCompatActivity {
                 Log.i(TAG, "receive");
 
                 //此处获取扫描结果信息
-                final String scanResult = intent.getStringExtra("EXTRA_SCAN_DATA");
                 final String scanStatus = intent.getStringExtra("EXTRA_SCAN_STATE");
+                final String scanResult = intent.getStringExtra("EXTRA_SCAN_DATA");
 
                 Log.i(TAG, "scanResult = " + scanResult + ", scanStatus = " + scanStatus);
 
                 if (SCAN_STATUS_OK.equals(scanStatus) && !TextUtils.isEmpty(scanResult)) {
+                    if (isChecking) {
+                        Log.i(TAG, "scan onReceive: but is checking last ticket, drop this request");
+                        return;
+                    }
+
                     long time = System.currentTimeMillis();
 
                     mTicketIdTv.setText(scanResult);
@@ -175,11 +185,10 @@ public class CheckTicketActivity extends AppCompatActivity {
         mAdapter.notifyDataSetChanged();
 
         mCheckBtn = (Button) findViewById(R.id.check_btn);
-
         mCheckBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new CheckTicketTask("scenery3dPZ0200000000196", 8).execute("scenery3dPZ0200000000196");
+                new CheckTicketTask("test", 8).execute("test");
             }
         });
     }
@@ -229,7 +238,7 @@ public class CheckTicketActivity extends AppCompatActivity {
     }
 
     private void resetResultUI() {
-        mResultLayout.setBackgroundColor(mCheckPassBgColor);
+//        mResultLayout.setBackgroundColor(mCheckPassBgColor);
         mResultTv.setTextColor(mCheckPassTextColor);
 
         mResultTv.setText("");
@@ -239,6 +248,29 @@ public class CheckTicketActivity extends AppCompatActivity {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         Log.i(TAG, "onConfigurationChanged: ");
+    }
+
+    @Override
+    public void onBackPressed() {
+        Log.d(TAG, "onBackPressed: ");
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(getString(R.string.alert_exit_app_msg))
+                .setPositiveButton(getString(R.string.alert_exit_app_positive), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Log.d(TAG, "Exit AlertDialog onPositiveButtonClick: ");
+                        CheckTicketActivity.super.onBackPressed();
+                    }
+                })
+                .setNegativeButton(getString(R.string.alert_exit_app_negative), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Log.d(TAG, "Exit AlertDialog onNegativeButtonClick: ");
+                    }
+                })
+                .create()
+                .show();
     }
 
     class CheckTicketTask extends AsyncTask<String, Void, Boolean> {
@@ -266,13 +298,17 @@ public class CheckTicketActivity extends AppCompatActivity {
 
         @Override
         protected void onPreExecute() {
-            super.onPreExecute();
+            isChecking = true;
             resetResultUI();
             mProgressBar.setVisibility(View.VISIBLE);
+
+            super.onPreExecute();
         }
 
         @Override
         protected void onPostExecute(Boolean isPassed) {
+            Log.d(TAG, "checkTicketTask onPostExecute: ");
+            isChecking = false;
             super.onPostExecute(isPassed);
             if (isPassed) {
                 mLastPassedTicketId = ticketId;
@@ -284,6 +320,13 @@ public class CheckTicketActivity extends AppCompatActivity {
             historyRecords.add(0, new HistoryModel(ticketId, time, isPassed));
             mAdapter.notifyItemInserted(0);
             mHistoryRecycler.scrollToPosition(0);
+        }
+
+        @Override
+        protected void onCancelled() {
+            Log.d(TAG, "checkTicketTask onCancelled: ");
+            isChecking = false;
+            super.onCancelled();
         }
     }
 }

@@ -66,9 +66,15 @@
 
     <string name="pref_title_vibrate">振动</string>
 
-    <!--check ticket -->
+    <!-- check ticket -->
     <string name="check_pass">检票通过</string>
     <string name="check_fail">检票失败</string>
+
+    <string name="alert_exit_app_msg">您确定退出吗？</string>
+    <string name="alert_exit_app_positive">确定</string>
+    <string name="alert_exit_app_negative">取消</string>
+
+
     <string name="title_activity_drawer">DrawerActivity</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -78,4 +84,9 @@
     <string name="action_settings">设置</string>
     <string name="action_statistics">统计</string>
     <string name="statistics_info">现共有%1$d张门票，其中%2$d张已检</string>
+
+    <!-- toast -->
+    <string name="no_network_tip"><![CDATA[没有网络哦 >.<]]></string>
+
+    <string name="pref_select_park">选择园区</string>
 </resources>

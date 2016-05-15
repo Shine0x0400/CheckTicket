@@ -2,9 +2,7 @@
 
     <ListPreference
         android:key="selected_park"
-        android:title="园区"
-
-        />
+        android:title="@string/pref_select_park" />
 
     <!-- NOTE: Hide buttons to simplify the UI. Users can touch outside the dialog to
          dismiss it. -->
@@ -17,6 +15,5 @@
         android:negativeButtonText="@null"
         android:positiveButtonText="@null"
         android:title="@string/pref_title_sync_frequency" />
-
 
 </PreferenceScreen>

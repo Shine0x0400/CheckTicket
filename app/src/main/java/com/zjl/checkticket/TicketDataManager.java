@@ -45,6 +45,10 @@ public class TicketDataManager extends Observable {
     public static final String SYNCHRONIZE_LOCK_PARKS = "synchronize_lock_parks";
     public static final String SYNCHRONIZE_LOCK_PARK_TICKETS = "synchronize_lock_park_tickets";
 
+    // network transfer locks
+    public static final String SYNCHRONIZE_LOCK_UPLOADING_TICKETS = "synchronize_lock_uploading_tickets";
+    public static final String SYNCHRONIZE_LOCK_FETCHING_TICKETS = "synchronize_lock_fetching_tickets";
+
     // notification
     public static final int SYNC_NOTIFICATION_ID = 0;
 
@@ -54,9 +58,10 @@ public class TicketDataManager extends Observable {
 
     private int mSyncFreq = -1;
 
+    private boolean mIsFetchingTickets = false;
+    private boolean mIsUploadingTickets = false;
 
     private final ArrayList<Park> parks = new ArrayList<>();
-
     private final ArrayList<String> parkTickets = new ArrayList<>();
 
     // sync task
@@ -134,25 +139,44 @@ public class TicketDataManager extends Observable {
             return;
         }
 
+        synchronized (SYNCHRONIZE_LOCK_FETCHING_TICKETS) {
+            Log.d(TAG, "fetchCurrentParkTickets: mIsFetchingTickets = " + mIsFetchingTickets);
+            if (mIsFetchingTickets) {
+                Log.i(TAG, "fetchCurrentParkTickets: lastFetching not finished yet, cancel this try");
+                return;
+            }
+
+            mIsFetchingTickets = true;
+        }
+
         notifyStartFetchTickets();
         new GetParkTicketsRequest(mCurrentParkId).enqueueRequest(new CommonCallback() {
             private String parkId = mCurrentParkId;
 
             @Override
             public void onFailure(Call call, IOException e) {
+                synchronized (SYNCHRONIZE_LOCK_FETCHING_TICKETS) {
+                    mIsFetchingTickets = false;
+                }
+
                 notifyCompleteFetchTickets();
+
                 super.onFailure(call, e);
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+                synchronized (SYNCHRONIZE_LOCK_FETCHING_TICKETS) {
+                    mIsFetchingTickets = false;
+                }
+
                 notifyCompleteFetchTickets();
+
                 super.onResponse(call, response);
             }
 
             @Override
             public void handleSuccess(Call call, Response response) throws IOException {
-                // TODO: 2016/5/12 need to check if this response still valid for current park id.
 
                 String bodyString = response.body().string();
                 Log.d(TAG, "onResponse: body=" + bodyString);
@@ -173,7 +197,7 @@ public class TicketDataManager extends Observable {
 
                     ArrayList<Ticket> tickets = new ArrayList<Ticket>();
                     for (String id : parkTickets) {
-                        // TODO: 2016/5/13 mock
+                        // TODO: assume server return only the non-checked tickets
                         Ticket t = new Ticket(id, CheckTicketContract.CheckTicketEntry.VALUE_IS_NOT_CHECKED, -1, parkId);
                         tickets.add(t);
                     }
@@ -186,10 +210,20 @@ public class TicketDataManager extends Observable {
     private boolean uploadCheckedTickets(long time) {
         Log.i(TAG, "uploadCheckedTickets: ");
 
+
         ArrayList<Ticket> tickets = CheckTicketDAO.getInstance().queryCheckedTicketsBeforeTime(time);
 
         if (tickets != null && !tickets.isEmpty()) {
             try {
+                synchronized (SYNCHRONIZE_LOCK_UPLOADING_TICKETS) {
+                    Log.d(TAG, "uploadCheckedTickets: mIsUploadingTickets = " + mIsUploadingTickets);
+                    if (mIsUploadingTickets) {
+                        Log.i(TAG, "uploadCheckedTickets: lastUploading not finished yet, cancel this try");
+                        return false;
+                    }
+                    mIsUploadingTickets = true;
+                }
+
                 notifyStartUploadTickets();
                 Response response = new SyncTicketsRequest(tickets).executeRequest();
 
@@ -212,6 +246,10 @@ public class TicketDataManager extends Observable {
                 e.printStackTrace();
                 return false;
             } finally {
+                synchronized (SYNCHRONIZE_LOCK_UPLOADING_TICKETS) {
+                    mIsUploadingTickets = false;
+                }
+
                 notifyCompleteUploadTickets();
             }
         }
@@ -224,7 +262,6 @@ public class TicketDataManager extends Observable {
             Log.d(TAG, "syncTickets: no connected network");
             return;
         }
-
 
         new Thread(new Runnable() {
             @Override
@@ -303,9 +340,12 @@ public class TicketDataManager extends Observable {
     }
 
     private void notifyCompleteUploadTickets() {
+        Log.i(TAG, "notifyCompleteUploadTickets: ");
+
         setChanged();
         notifyObservers(new MessageBundle(MessageType.COMPLETE_UPLOAD_TICKETS, null));
 
+        // TODO: 2016/5/16 should notify the real result, really Success or Fail
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(CheckTicketApplication.sApplicationContext)
                         .setSmallIcon(R.drawable.cloud_upload)
@@ -342,6 +382,7 @@ public class TicketDataManager extends Observable {
         setChanged();
         notifyObservers(new MessageBundle(MessageType.COMPLETE_FETCH_TICKETS, null));
 
+        // TODO: 2016/5/16 should notify the real result, really Success or Fail
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(CheckTicketApplication.sApplicationContext)
                         .setSmallIcon(R.drawable.cloud_download)

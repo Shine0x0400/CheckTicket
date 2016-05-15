@@ -9,7 +9,7 @@ import com.zjl.checkticket.model.Ticket;
  * Created by zjl on 2016/5/3.
  */
 public class TicketUtil {
-    private static TicketUtil sInstance;
+    private static volatile TicketUtil sInstance;
 
     private TicketUtil() {
 
@@ -28,7 +28,6 @@ public class TicketUtil {
 
     public boolean checkValidity(String tickedId) {
         long time = System.currentTimeMillis();
-        // TODO: 2016/5/13 time-consuming
         Ticket ticket = CheckTicketDAO.getInstance().queryTicket(tickedId);
 
         if (ticket == null || CheckTicketContract.CheckTicketEntry.VALUE_IS_CHECKED.equals(ticket.getIsChecked())) {
@@ -38,13 +37,12 @@ public class TicketUtil {
             ticket.setFirstCheckTime(time);
             ticket.setIsChecked(CheckTicketContract.CheckTicketEntry.VALUE_IS_CHECKED);
 
-            // TODO: 2016/5/13 time-consuming
             CheckTicketDAO.getInstance().updateTicket(ticket);
             return true;
         }
     }
 
     public boolean checkValidity(Ticket t) {
-        return false;
+        return t != null && checkValidity(t.getId());
     }
 }

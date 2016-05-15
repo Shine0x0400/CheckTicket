@@ -6,7 +6,6 @@ import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -25,7 +24,9 @@ import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
+import com.zjl.checkticket.account.Account;
 import com.zjl.checkticket.account.AccountManager;
+import com.zjl.checkticket.connectivity.NetworkUtil;
 import com.zjl.checkticket.http.ResponseBodyModel;
 
 import java.io.IOException;
@@ -38,12 +39,7 @@ import okhttp3.Response;
  * A login screen that offers login via username/password.
  */
 public class LoginActivity extends AppCompatActivity {
-
     private static final String TAG = "LoginActivity";
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
-    private UserLoginTask mAuthTask = null;
 
     // UI references.
     private AutoCompleteTextView mUsernameView;
@@ -92,17 +88,13 @@ public class LoginActivity extends AppCompatActivity {
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
-        if (mAuthTask != null) {
-            return;
-        }
-
         // Reset errors.
         mUsernameView.setError(null);
         mPasswordView.setError(null);
 
         // Store values at the time of the login attempt.
-        String name = mUsernameView.getText().toString();
-        String password = mPasswordView.getText().toString();
+        final String name = mUsernameView.getText().toString();
+        final String password = mPasswordView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
@@ -123,13 +115,18 @@ public class LoginActivity extends AppCompatActivity {
             // form field with an error.
             focusView.requestFocus();
         } else {
+            if (!NetworkUtil.getInstance().isConnected()) {
+                Toast.makeText(this, R.string.no_network_tip, Toast.LENGTH_LONG).show();
+                return;
+            }
+
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-//            mAuthTask = new UserLoginTask(name, password);
-//            mAuthTask.execute((Void) null);
 
             AccountManager.getInstance().login(name, password, new Callback() {
+                String saveName = name;
+
                 @Override
                 public void onFailure(Call call, IOException e) {
                     e.printStackTrace();
@@ -174,8 +171,8 @@ public class LoginActivity extends AppCompatActivity {
                             if (model.getData()) {
                                 Log.d(TAG, "run: login success");
 
-                                startActivity(
-                                        new Intent(LoginActivity.this, CheckTicketActivity.class));
+                                // retain account info in the manager
+                                AccountManager.getInstance().setAccount(new Account(saveName));
 
                                 SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                                 String parkId = sharedPref.getString(CheckTicketApplication.PREF_KEY_SELECTED_PARK, "");
@@ -188,6 +185,8 @@ public class LoginActivity extends AppCompatActivity {
 
                                 TicketDataManager.getInstance().startAutoSyncTask();
 
+                                startActivity(
+                                        new Intent(LoginActivity.this, CheckTicketActivity.class));
                                 finish();
                             } else {
                                 mPasswordView
@@ -235,55 +234,6 @@ public class LoginActivity extends AppCompatActivity {
             // and hide the relevant UI components.
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
             mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-        }
-    }
-
-
-    /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
-     */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-
-        private final String mEmail;
-        private final String mPassword;
-
-        UserLoginTask(String email, String password) {
-            mEmail = email;
-            mPassword = password;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
-
-            try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
-            }
-
-            return false;
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            mAuthTask = null;
-            showProgress(false);
-
-            if (success) {
-                finish();
-            } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
-            }
-        }
-
-        @Override
-        protected void onCancelled() {
-            mAuthTask = null;
-            showProgress(false);
         }
     }
 

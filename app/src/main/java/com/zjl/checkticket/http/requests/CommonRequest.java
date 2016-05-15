@@ -22,21 +22,25 @@ public class CommonRequest {
     }
 
     public Call enqueueRequest(Callback callback) {
-        if (!NetworkUtil.getInstance().isConnected()) {
+        Call call = HttpClient.getOkHttpClient().newCall(request);
 
-            return null;
+        if (!NetworkUtil.getInstance().isConnected()) {
+            callback.onFailure(call, new IOException("no network connected"));
+            return call;
         }
 
-        Call call = HttpClient.getOkHttpClient().newCall(request);
         call.enqueue(callback);
-
         return call;
     }
 
     public Response executeRequest() throws IOException {
         Call call = HttpClient.getOkHttpClient().newCall(request);
-        Response response = call.execute();
 
+        if (!NetworkUtil.getInstance().isConnected()) {
+            throw new IOException("no network connected");
+        }
+
+        Response response = call.execute();
         return response;
     }
 }

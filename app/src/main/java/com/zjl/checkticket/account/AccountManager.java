@@ -8,7 +8,6 @@ import java.io.IOException;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -18,6 +17,16 @@ import okhttp3.Response;
  */
 public class AccountManager {
     private static AccountManager sInstance = null;
+
+    private Account mAccount = null;
+
+    public Account getAccount() {
+        return mAccount;
+    }
+
+    public void setAccount(Account account) {
+        this.mAccount = account;
+    }
 
     private AccountManager() {
     }
@@ -54,7 +63,6 @@ public class AccountManager {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 callback.onResponse(call, response);
-
             }
         });
     }
@@ -68,29 +76,4 @@ public class AccountManager {
             this.password = pwd;
         }
     }
-
-    // /**
-    // * Http callback
-    // */
-    // private class LoginRequestCallback implements Callback {
-    //
-    // // the callback related to every specified business
-    // private Callback businessCallback;
-    //
-    // LoginRequestCallback(Callback callback) {
-    // businessCallback = callback;
-    // }
-    //
-    // @Override
-    // public void onFailure(Call call, IOException e) {
-    // businessCallback.onFailure(call, e);
-    //
-    // }
-    //
-    // @Override
-    // public void onResponse(Call call, Response response) throws IOException {
-    // businessCallback.onResponse(call, response);
-    // }
-    // }
-
 }

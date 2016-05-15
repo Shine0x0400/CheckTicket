@@ -27,19 +27,11 @@ public class CheckTicketApplication extends Application implements SharedPrefere
         sApplicationContext = this;
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-//        String parkId = sharedPref.getString(PREF_KEY_SELECTED_PARK, "");
-//
-//        if (!TextUtils.isEmpty(parkId)) {
-//            Log.i(TAG, "onCreate: parkId=" + parkId + ", init fetch tickets procedure");
-//            TicketDataManager.getInstance().setCurrentParkId(parkId);
-//            TicketDataManager.getInstance().fetchCurrentParkTickets();
-//        }
-
         sharedPref.registerOnSharedPreferenceChangeListener(this);
     }
 
 
-    // NOTE: this callback will never be called!
+    // NOTE: this callback will never be called!!!
     @Override
     public void onTerminate() {
         Log.i(TAG, "onTerminate: --- ");
@@ -69,7 +61,6 @@ public class CheckTicketApplication extends Application implements SharedPrefere
             if (syncFreq > 0) {
                 TicketDataManager.getInstance().startAutoSyncTask();
             }
-
         }
     }
 }

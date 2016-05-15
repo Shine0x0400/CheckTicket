@@ -26,5 +26,6 @@ public class HttpConstants {
      */
     public static final String URL_PATH_GET_PARK_TICKETS = "/afc-ui/appCheck/getParkTickets";
 
-    public static final String URL_PATH_SYNC_TICKETS = "/afc-ui//appCheck/synData";
+    // TODO: 2016/5/16 confirm /afc-ui//appCheck/synData
+    public static final String URL_PATH_SYNC_TICKETS = "/afc-ui/appCheck/synData";
 }
