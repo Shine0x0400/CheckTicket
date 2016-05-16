@@ -4,14 +4,17 @@
 
     <item
         android:id="@+id/action_settings"
-        android:icon="@drawable/ic_menu_manage"
         android:title="@string/action_settings"
         app:showAsAction="never" />
 
 
     <item
         android:id="@+id/action_statistics"
-        android:icon="@drawable/ic_menu_gallery"
         android:title="@string/action_statistics"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_test"
+        android:title="测试"
         app:showAsAction="never" />
 </menu>

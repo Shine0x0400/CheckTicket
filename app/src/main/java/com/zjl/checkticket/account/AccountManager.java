@@ -1,6 +1,6 @@
 package com.zjl.checkticket.account;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSON;
 import com.zjl.checkticket.http.HttpClient;
 import com.zjl.checkticket.http.HttpConstants;
 
@@ -47,7 +47,7 @@ public class AccountManager {
         StringBuilder url = new StringBuilder(HttpConstants.HOST_NAME);
         url.append(HttpConstants.URL_PATH_LOG_IN);
 
-        String jsonBody = JSONObject.toJSONString(new LoginParamsModel(username, password));
+        String jsonBody = JSON.toJSONString(new LoginParamsModel(username, password));
 
         Request request = new Request.Builder()
                 .url(url.toString())

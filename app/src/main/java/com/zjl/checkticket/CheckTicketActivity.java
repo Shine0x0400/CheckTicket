@@ -203,6 +203,11 @@ public class CheckTicketActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    private void gotoTestDrawer() {
+        Intent intent = new Intent(CheckTicketActivity.this, DrawerActivity.class);
+        startActivity(intent);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_checkticket_menu, menu);
@@ -218,6 +223,10 @@ public class CheckTicketActivity extends AppCompatActivity {
 
             case R.id.action_statistics:
                 gotoStatistics();
+                return true;
+
+            case R.id.action_test:
+                gotoTestDrawer();
                 return true;
 
             default:
