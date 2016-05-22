@@ -5,15 +5,17 @@
     android:layout_height="match_parent"
     tools:context="com.zjl.checkticket.CheckTicketActivity">
 
-    <include layout="@layout/toolbar" />
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar" />
 
     <RelativeLayout
         android:id="@+id/result_layout"
+        android:layout_below="@id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="160dp"
-        android:layout_below="@+id/toolbar"
         android:layout_centerHorizontal="true"
-        android:background="@color/check_pass_bg">
+        android:background="@drawable/side_nav_bar">
 
         <ImageView
             android:id="@+id/check_img"

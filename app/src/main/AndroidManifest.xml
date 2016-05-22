@@ -41,15 +41,6 @@
                 android:value="com.zjl.checkticket.CheckTicketActivity" />
         </activity>
         <activity
-            android:name=".DrawerActivity"
-            android:label="@string/title_activity_drawer"
-            android:parentActivityName=".CheckTicketActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.zjl.checkticket.CheckTicketActivity" />
-        </activity>
-        <activity
             android:name=".statistics.StatisticsActivity"
             android:label="@string/title_activity_statistics"
             android:parentActivityName=".CheckTicketActivity"

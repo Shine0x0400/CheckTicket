@@ -13,8 +13,4 @@
         android:title="@string/action_statistics"
         app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_test"
-        android:title="测试"
-        app:showAsAction="never" />
 </menu>

@@ -10,6 +10,13 @@ import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -40,7 +47,7 @@ import java.util.Locale;
  * 检票界面，显示检票结果；
  * 该界面不可见时，应该将检票工作委托给Service后台任务。
  */
-public class CheckTicketActivity extends AppCompatActivity {
+public class CheckTicketActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = "CheckTicketActivity";
 
@@ -56,6 +63,9 @@ public class CheckTicketActivity extends AppCompatActivity {
     private TextView mTimeTv;
     private ProgressBar mProgressBar;
     private RecyclerView mHistoryRecycler;
+
+    private DrawerLayout mDrawerLayout;
+    private ActionBarDrawerToggle mDrawerToggle;
 
     private HistoryAdapter mAdapter;
 
@@ -86,10 +96,7 @@ public class CheckTicketActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         Log.i(TAG, "onCreate: ");
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_check_ticket);
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setContentView(R.layout.activity_check);
 
         initResources();
         initWidgets();
@@ -170,6 +177,9 @@ public class CheckTicketActivity extends AppCompatActivity {
     }
 
     private void initWidgets() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         mResultLayout = (RelativeLayout) findViewById(R.id.result_layout);
         mResultImg = (ImageView) mResultLayout.findViewById(R.id.check_img);
         mResultTv = (TextView) mResultLayout.findViewById(R.id.result_txt);
@@ -191,6 +201,25 @@ public class CheckTicketActivity extends AppCompatActivity {
                 new CheckTicketTask("test", 8).execute("test");
             }
         });
+
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "扫描...", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
+
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerToggle = new ActionBarDrawerToggle(
+                this, mDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+        mDrawerToggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
     }
 
     private void gotoSettings() {
@@ -203,11 +232,6 @@ public class CheckTicketActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void gotoTestDrawer() {
-        Intent intent = new Intent(CheckTicketActivity.this, DrawerActivity.class);
-        startActivity(intent);
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_checkticket_menu, menu);
@@ -216,6 +240,13 @@ public class CheckTicketActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        // Pass the event to ActionBarDrawerToggle, if it returns
+        // true, then it has handled the app icon touch event
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+            Log.i(TAG, "onOptionsItemSelected: the drawerToggle has handled the app icon touch event");
+            return true;
+        }
+
         switch (item.getItemId()) {
             case R.id.action_settings:
                 gotoSettings();
@@ -223,10 +254,6 @@ public class CheckTicketActivity extends AppCompatActivity {
 
             case R.id.action_statistics:
                 gotoStatistics();
-                return true;
-
-            case R.id.action_test:
-                gotoTestDrawer();
                 return true;
 
             default:
@@ -255,31 +282,59 @@ public class CheckTicketActivity extends AppCompatActivity {
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
         Log.i(TAG, "onConfigurationChanged: ");
+        super.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
     @Override
     public void onBackPressed() {
         Log.d(TAG, "onBackPressed: ");
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(getString(R.string.alert_exit_app_msg))
-                .setPositiveButton(getString(R.string.alert_exit_app_positive), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Log.d(TAG, "Exit AlertDialog onPositiveButtonClick: ");
-                        CheckTicketActivity.super.onBackPressed();
-                    }
-                })
-                .setNegativeButton(getString(R.string.alert_exit_app_negative), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Log.d(TAG, "Exit AlertDialog onNegativeButtonClick: ");
-                    }
-                })
-                .create()
-                .show();
+        if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+            mDrawerLayout.closeDrawer(GravityCompat.START);
+        } else {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage(getString(R.string.alert_exit_app_msg))
+                    .setPositiveButton(getString(R.string.alert_exit_app_positive), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Log.d(TAG, "Exit AlertDialog onPositiveButtonClick: ");
+                            CheckTicketActivity.super.onBackPressed();
+                        }
+                    })
+                    .setNegativeButton(getString(R.string.alert_exit_app_negative), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Log.d(TAG, "Exit AlertDialog onNegativeButtonClick: ");
+                        }
+                    })
+                    .create()
+                    .show();
+        }
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_statistics) {
+            gotoStatistics();
+        } else if (id == R.id.nav_settings) {
+            gotoSettings();
+        }
+
+        mDrawerLayout.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    @Override
+    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        Log.i(TAG, "onPostCreate: ");
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        mDrawerToggle.syncState();
     }
 
     class CheckTicketTask extends AsyncTask<String, Void, Boolean> {
