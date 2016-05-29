@@ -1,6 +1,7 @@
 package com.zjl.checkticket.account;
 
 import com.alibaba.fastjson.JSON;
+import com.zjl.checkticket.http.BaseRequestParams;
 import com.zjl.checkticket.http.HttpClient;
 import com.zjl.checkticket.http.HttpConstants;
 
@@ -67,13 +68,32 @@ public class AccountManager {
         });
     }
 
-    static class LoginParamsModel {
-        String username;
-        String password;
+    public static class LoginParamsModel extends BaseRequestParams {
+        private String username;
+        private String password;
 
         public LoginParamsModel(String name, String pwd) {
             this.username = name;
             this.password = pwd;
+        }
+
+        public LoginParamsModel() {
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public void setUsername(String username) {
+            this.username = username;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
         }
     }
 }

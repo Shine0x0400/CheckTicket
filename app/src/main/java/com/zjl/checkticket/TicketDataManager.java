@@ -50,7 +50,9 @@ public class TicketDataManager extends Observable {
     public static final String SYNCHRONIZE_LOCK_FETCHING_TICKETS = "synchronize_lock_fetching_tickets";
 
     // notification
-    public static final int SYNC_NOTIFICATION_ID = 0;
+    public static final int DOWNLOAD_NOTIFICATION_ID = 0;
+    // NOTE: use one same id for both.
+    public static final int UPLOAD_NOTIFICATION_ID = 0;
 
     private static volatile TicketDataManager manager;
 
@@ -336,7 +338,7 @@ public class TicketDataManager extends Observable {
         NotificationManager mNotificationManager =
                 (NotificationManager) CheckTicketApplication.sApplicationContext.getSystemService(Context.NOTIFICATION_SERVICE);
 // mId allows you to update the notification later on.
-        mNotificationManager.notify(SYNC_NOTIFICATION_ID, mBuilder.build());
+        mNotificationManager.notify(UPLOAD_NOTIFICATION_ID, mBuilder.build());
     }
 
     private void notifyCompleteUploadTickets() {
@@ -357,7 +359,7 @@ public class TicketDataManager extends Observable {
         NotificationManager mNotificationManager =
                 (NotificationManager) CheckTicketApplication.sApplicationContext.getSystemService(Context.NOTIFICATION_SERVICE);
 // mId allows you to update the notification later on.
-        mNotificationManager.notify(SYNC_NOTIFICATION_ID, mBuilder.build());
+        mNotificationManager.notify(UPLOAD_NOTIFICATION_ID, mBuilder.build());
     }
 
     private void notifyStartFetchTickets() {
@@ -375,7 +377,7 @@ public class TicketDataManager extends Observable {
         NotificationManager mNotificationManager =
                 (NotificationManager) CheckTicketApplication.sApplicationContext.getSystemService(Context.NOTIFICATION_SERVICE);
 // mId allows you to update the notification later on.
-        mNotificationManager.notify(SYNC_NOTIFICATION_ID, mBuilder.build());
+        mNotificationManager.notify(DOWNLOAD_NOTIFICATION_ID, mBuilder.build());
     }
 
     private void notifyCompleteFetchTickets() {
@@ -394,6 +396,6 @@ public class TicketDataManager extends Observable {
         NotificationManager mNotificationManager =
                 (NotificationManager) CheckTicketApplication.sApplicationContext.getSystemService(Context.NOTIFICATION_SERVICE);
 // mId allows you to update the notification later on.
-        mNotificationManager.notify(SYNC_NOTIFICATION_ID, mBuilder.build());
+        mNotificationManager.notify(DOWNLOAD_NOTIFICATION_ID, mBuilder.build());
     }
 }

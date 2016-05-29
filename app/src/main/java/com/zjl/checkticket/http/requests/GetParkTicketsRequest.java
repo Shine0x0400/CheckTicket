@@ -20,11 +20,22 @@ public class GetParkTicketsRequest extends CommonRequest {
         request = new Request.Builder().url(url).post(requestBody).build();
     }
 
-    static class RequestModel {
-        String park;
+    public static class RequestModel {
+        private String park;
 
         public RequestModel(String parkId) {
             this.park = parkId;
+        }
+
+        public RequestModel() {
+        }
+
+        public String getPark() {
+            return park;
+        }
+
+        public void setPark(String park) {
+            this.park = park;
         }
     }
 }

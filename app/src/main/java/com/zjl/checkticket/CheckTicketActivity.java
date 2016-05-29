@@ -7,13 +7,16 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -78,6 +81,10 @@ public class CheckTicketActivity extends AppCompatActivity implements Navigation
     private String mCheckPassSentence;
     private String mCheckFailSentence;
 
+    //vibrator
+    private Vibrator mVibrator;
+    private long[] mVibratePattern = {0, 300, 100, 300};
+
     // last ticket that passed the check
     private String mLastPassedTicketId;
 
@@ -102,6 +109,9 @@ public class CheckTicketActivity extends AppCompatActivity implements Navigation
         initWidgets();
 
         initScan();
+        configScan();
+
+        mVibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
     }
 
     @Override
@@ -158,6 +168,39 @@ public class CheckTicketActivity extends AppCompatActivity implements Navigation
         //在用户自行获取数据时，将广播的优先级调到最高 1000，***此处必须***
     }
 
+    /**
+     * 参数名	参数类型	备注
+     * EXTRA_SCAN_POWER	INT	值 = 0 表示禁用扫描功能
+     * = 1 表示打开扫描功能
+     * 说明：当扫描头刚打开的时候需要初始化扫描头，需要一定时间，此时将忽略相关扫描请求
+     * EXTRA_TRIG_MODE	INT	值 = 0 配置扫描头为普通触发模式
+     * = 1 配置扫描头为连续扫描模式
+     * EXTRA_SCAN_MODE	INT	值 = 1 ：直接填充模式
+     * = 2 ：虚拟按键模式
+     * = 3 ：API输出模式
+     * EXTRA_SCAN_AUTOENT	INT	值 = 0 关闭自动换行
+     * = 1 允许自动换行
+     * EXTRA_SCAN_NOTY_SND	INT	值 = 0 关闭声音提示
+     * = 1 打开声音提示
+     * EXTRA_SCAN_NOTY_VIB	INT	值 = 0 关闭振动提示
+     * = 1 打开振动提示
+     * EXTRA_SCAN_NOTY_LED	INT	值 = 0 关闭指示灯提示
+     * = 1 打开指示灯提示
+     */
+    private void configScan() {
+        Intent intent = new Intent("ACTION_BAR_SCANCFG");
+
+        // 设置扫描为API输出模式
+        intent.putExtra("EXTRA_SCAN_MODE", 3);
+        // disable vibrate
+        intent.putExtra("EXTRA_SCAN_NOTY_VIB", 0);
+        // enable sound and led
+        intent.putExtra("EXTRA_SCAN_NOTY_SND", 1);
+        intent.putExtra("EXTRA_SCAN_NOTY_LED", 1);
+
+        this.sendBroadcast(intent);
+    }
+
     private void initResources() {
         Resources resources = getResources();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -203,12 +246,19 @@ public class CheckTicketActivity extends AppCompatActivity implements Navigation
         });
 
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "扫描...", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+//                Snackbar.make(view, "扫描...", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+
+//                handleCheckResult(false);
+
+                // issue a scan action
+                Intent intent = new Intent("ACTION_BAR_TRIGSCAN");
+                CheckTicketActivity.this.sendBroadcast(intent);
+
             }
         });
 
@@ -263,14 +313,28 @@ public class CheckTicketActivity extends AppCompatActivity implements Navigation
         }
     }
 
-    private void updateResultUI(boolean checkResult) {
+    private void handleCheckResult(boolean checkResult) {
+        // update UI
         mResultImg.setBackgroundResource(
                 checkResult ? R.drawable.check_success : R.drawable.check_fail);
-
         // mResultLayout.setBackgroundColor(checkResult ? mCheckPassBgColor : mCheckFailBgColor);
         mResultTv.setTextColor(checkResult ? mCheckPassTextColor : mCheckFailTextColor);
-
         mResultTv.setText(checkResult ? mCheckPassSentence : mCheckFailSentence);
+
+        if (!checkResult) {
+            if (SharedPreferenceUtil.getInstance().isNotificationOn()) {
+                if (SharedPreferenceUtil.getInstance().isVibrateOn() && mVibrator.hasVibrator()) {
+                    mVibrator.vibrate(mVibratePattern, -1);
+                }
+
+                String soundPath = SharedPreferenceUtil.getInstance().getWarningSoundPath();
+                if (!TextUtils.isEmpty(soundPath)) {
+                    // TODO: 2016/5/29 cache this ringtone
+                    Ringtone ringtone = RingtoneManager.getRingtone(this, Uri.parse(soundPath));
+                    ringtone.play();
+                }
+            }
+        }
     }
 
     private void resetResultUI() {
@@ -379,7 +443,7 @@ public class CheckTicketActivity extends AppCompatActivity implements Navigation
             }
 
             mProgressBar.setVisibility(View.GONE);
-            updateResultUI(isPassed);
+            handleCheckResult(isPassed);
 
             historyRecords.add(0, new HistoryModel(ticketId, time, isPassed));
             mAdapter.notifyItemInserted(0);
