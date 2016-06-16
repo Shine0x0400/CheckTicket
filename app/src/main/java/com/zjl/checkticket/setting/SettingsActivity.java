@@ -224,31 +224,31 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         private static final String TAG = "DataSyncPreference";
         public static final String PARKS_PREFERENCE_NAME = "park_list";
 
-        static class ParksPreferenceModel {
-            private CharSequence[] entries;
-            private CharSequence[] values;
+        public static class ParksPreferenceModel {
+            private String[] entries;
+            private String[] values;
 
             public ParksPreferenceModel() {
             }
 
-            public ParksPreferenceModel(CharSequence[] entries, CharSequence[] values) {
+            public ParksPreferenceModel(String[] entries, String[] values) {
                 this.values = values;
                 this.entries = entries;
             }
 
-            public CharSequence[] getEntries() {
+            public String[] getEntries() {
                 return entries;
             }
 
-            public void setEntries(CharSequence[] entries) {
+            public void setEntries(String[] entries) {
                 this.entries = entries;
             }
 
-            public CharSequence[] getValues() {
+            public String[] getValues() {
                 return values;
             }
 
-            public void setValues(CharSequence[] values) {
+            public void setValues(String[] values) {
                 this.values = values;
             }
         }
@@ -322,8 +322,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
                     if (parks != null && !parks.isEmpty()) {
                         final ListPreference parkPref = (ListPreference) findPreference("selected_park");
-                        final CharSequence[] entries = new CharSequence[parks.size()];
-                        final CharSequence[] values = new CharSequence[parks.size()];
+                        final String[] entries = new String[parks.size()];
+                        final String[] values = new String[parks.size()];
                         synchronized (TicketDataManager.SYNCHRONIZE_LOCK_PARKS) {
                             int idx = 0;
                             for (Park park : parks) {

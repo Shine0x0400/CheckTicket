@@ -11,6 +11,7 @@ import android.util.Log;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.TypeReference;
+import com.zjl.checkticket.account.AccountManager;
 import com.zjl.checkticket.connectivity.NetworkUtil;
 import com.zjl.checkticket.db.CheckTicketContract;
 import com.zjl.checkticket.db.CheckTicketDAO;
@@ -141,6 +142,11 @@ public class TicketDataManager extends Observable {
             return;
         }
 
+        if (!AccountManager.getInstance().hasAccountLogged()) {
+            Log.e(TAG, "fetchCurrentParkTickets: have no account logged in");
+            return;
+        }
+
         synchronized (SYNCHRONIZE_LOCK_FETCHING_TICKETS) {
             Log.d(TAG, "fetchCurrentParkTickets: mIsFetchingTickets = " + mIsFetchingTickets);
             if (mIsFetchingTickets) {
@@ -209,9 +215,19 @@ public class TicketDataManager extends Observable {
         });
     }
 
+    /**
+     * upload the tickets which have been checked before the specified time to server.
+     *
+     * @param time the specified time.
+     * @return if upload successfully.
+     */
     private boolean uploadCheckedTickets(long time) {
         Log.i(TAG, "uploadCheckedTickets: ");
 
+        if (!AccountManager.getInstance().hasAccountLogged()) {
+            Log.e(TAG, "uploadCheckedTickets: have no account logged in");
+            return false;
+        }
 
         ArrayList<Ticket> tickets = CheckTicketDAO.getInstance().queryCheckedTicketsBeforeTime(time);
 
@@ -262,6 +278,11 @@ public class TicketDataManager extends Observable {
         Log.i(TAG, "syncTickets: ");
         if (!NetworkUtil.getInstance().isConnected()) {
             Log.d(TAG, "syncTickets: no connected network");
+            return;
+        }
+
+        if (!AccountManager.getInstance().hasAccountLogged()) {
+            Log.e(TAG, "syncTickets: have no account logged in");
             return;
         }
 

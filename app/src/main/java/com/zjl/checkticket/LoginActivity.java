@@ -3,12 +3,9 @@ package com.zjl.checkticket;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -22,18 +19,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
-import com.zjl.checkticket.account.Account;
 import com.zjl.checkticket.account.AccountManager;
 import com.zjl.checkticket.connectivity.NetworkUtil;
-import com.zjl.checkticket.http.ResponseBodyModel;
-
-import java.io.IOException;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Response;
 
 /**
  * A login screen that offers login via username/password.
@@ -124,78 +111,42 @@ public class LoginActivity extends AppCompatActivity {
             // perform the user login attempt.
             showProgress(true);
 
-            AccountManager.getInstance().login(name, password, new Callback() {
-                String saveName = name;
-
+            AccountManager.getInstance().login(name, password, new AccountManager.LoginCallback() {
                 @Override
-                public void onFailure(Call call, IOException e) {
-                    e.printStackTrace();
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            showProgress(false);
-                            Toast.makeText(getApplicationContext(), R.string.login_response_failure,
-                                    Toast.LENGTH_LONG).show();
-                        }
-                    });
-                }
-
-                @Override
-                public void onResponse(Call call, final Response response) throws IOException {
-                    if (!response.isSuccessful()) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                showProgress(false);
-                                Toast.makeText(getApplicationContext(),
-                                        R.string.login_response_failure, Toast.LENGTH_LONG).show();
-                            }
-                        });
-                        throw new IOException("Unexpected code " + response);
-                    }
-
-                    Log.d(TAG, "onResponse: response=" + response);
-
-                    String bodyString = response.body().string();
-                    Log.d(TAG, "onResponse: body=" + bodyString);
-
-                    final ResponseBodyModel<Boolean> model = JSON.parseObject(bodyString,
-                            new TypeReference<ResponseBodyModel<Boolean>>() {
-                            });
+                public void onLoginComplete(final boolean success) {
 
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             showProgress(false);
 
-                            if (model.getData()) {
+                            if (!success) {
+                                Toast.makeText(getApplicationContext(), R.string.login_response_failure,
+                                        Toast.LENGTH_LONG).show();
+
+                                mPasswordView.requestFocus();
+
+                            } else {
                                 Log.d(TAG, "run: login success");
 
-                                // retain account info in the manager
-                                AccountManager.getInstance().setAccount(new Account(saveName));
-
-                                SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                                String parkId = sharedPref.getString(CheckTicketApplication.PREF_KEY_SELECTED_PARK, "");
-
-                                if (!TextUtils.isEmpty(parkId)) {
-                                    Log.i(TAG, "Login success: parkId=" + parkId + ", init fetch tickets procedure");
-                                    TicketDataManager.getInstance().setCurrentParkId(parkId);
-                                    TicketDataManager.getInstance().fetchCurrentParkTickets();
-                                }
-
-                                TicketDataManager.getInstance().startAutoSyncTask();
-
-                                startActivity(
-                                        new Intent(LoginActivity.this, CheckTicketActivity.class));
+//                                SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+//                                String parkId = sharedPref.getString(CheckTicketApplication.PREF_KEY_SELECTED_PARK, "");
+//
+//                                if (!TextUtils.isEmpty(parkId)) {
+//                                    Log.i(TAG, "Login success: parkId=" + parkId + ", init fetch tickets procedure");
+//                                    TicketDataManager.getInstance().setCurrentParkId(parkId);
+//                                    TicketDataManager.getInstance().fetchCurrentParkTickets();
+//                                }
+//
+//                                TicketDataManager.getInstance().startAutoSyncTask();
+//
+//                                startActivity(
+//                                        new Intent(LoginActivity.this, CheckTicketActivity.class));
+                                setResult(RESULT_OK);
                                 finish();
-                            } else {
-                                mPasswordView
-                                        .setError(getString(R.string.error_incorrect_password));
-                                mPasswordView.requestFocus();
                             }
                         }
                     });
-
                 }
             });
         }
