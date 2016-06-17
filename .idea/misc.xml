@@ -6,7 +6,7 @@
     <option name="id" value="1448612952037" />
     <option name="importOrder" value="com;org;android;java;javax;" />
     <option name="name" value="default" />
-    <option name="pathToConfigFileJava" value="D:/formatter/LetvAndroidFormatter-linesplit-100.xml" />
+    <option name="pathToConfigFileJava" value="$PROJECT_DIR$/../../formatter/LetvAndroidFormatter-linesplit-100.xml" />
     <option name="selectedJavaProfile" value="LetvAndroidFomatter" />
   </component>
   <component name="EntryPointsManager">
