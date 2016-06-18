@@ -6,10 +6,12 @@ import android.annotation.TargetApi;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
@@ -37,6 +39,12 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            // Show the Up button in the action bar.
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+
         setContentView(R.layout.activity_login);
         // Set up the login form.
         mUsernameView = (AutoCompleteTextView) findViewById(R.id.username);
@@ -65,8 +73,8 @@ public class LoginActivity extends AppCompatActivity {
         mProgressView = findViewById(R.id.login_progress);
 
         // TODO: 2016/5/14 remove
-        mUsernameView.setText("app01");
-        mPasswordView.setText("admin");
+//        mUsernameView.setText("app01");
+//        mPasswordView.setText("admin");
     }
 
     /**
@@ -129,19 +137,6 @@ public class LoginActivity extends AppCompatActivity {
                             } else {
                                 Log.d(TAG, "run: login success");
 
-//                                SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-//                                String parkId = sharedPref.getString(CheckTicketApplication.PREF_KEY_SELECTED_PARK, "");
-//
-//                                if (!TextUtils.isEmpty(parkId)) {
-//                                    Log.i(TAG, "Login success: parkId=" + parkId + ", init fetch tickets procedure");
-//                                    TicketDataManager.getInstance().setCurrentParkId(parkId);
-//                                    TicketDataManager.getInstance().fetchCurrentParkTickets();
-//                                }
-//
-//                                TicketDataManager.getInstance().startAutoSyncTask();
-//
-//                                startActivity(
-//                                        new Intent(LoginActivity.this, CheckTicketActivity.class));
                                 setResult(RESULT_OK);
                                 finish();
                             }
@@ -192,6 +187,17 @@ public class LoginActivity extends AppCompatActivity {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         Log.i(TAG, "onConfigurationChanged: ");
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Log.d(TAG, "onOptionsItemSelected: ");
+        int id = item.getItemId();
+        if (id == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
 

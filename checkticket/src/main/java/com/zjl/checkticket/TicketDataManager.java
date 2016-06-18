@@ -1,5 +1,17 @@
 package com.zjl.checkticket;
 
+import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
+import android.text.TextUtils;
+import android.util.Log;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.TypeReference;
@@ -14,18 +26,6 @@ import com.zjl.checkticket.http.requests.GetParksRequest;
 import com.zjl.checkticket.http.requests.SyncTicketsRequest;
 import com.zjl.checkticket.model.Park;
 import com.zjl.checkticket.model.Ticket;
-
-import android.app.NotificationManager;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.preference.PreferenceManager;
-import android.support.v4.app.NotificationCompat;
-import android.text.TextUtils;
-import android.util.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -198,6 +198,7 @@ public class TicketDataManager extends Observable
 
     private void fetchCurrentParkTickets() {
         if (TextUtils.isEmpty(mCurrentParkId)) {
+            Log.e(TAG, "fetchCurrentParkTickets: no park is selected");
             return;
         }
 
@@ -330,6 +331,8 @@ public class TicketDataManager extends Observable
 
                 notifyCompleteUploadTickets();
             }
+        } else {
+            Log.i(TAG, "uploadCheckedTickets: no checked tickets need been uploaded");
         }
         return false;
     }

@@ -14,5 +14,6 @@ public class GetParksRequest extends CommonRequest {
         request = new Request.Builder()
                 .url(url)
                 .build();
+        blockIfSessionExpired = true;
     }
 }

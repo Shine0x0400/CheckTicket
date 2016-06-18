@@ -24,31 +24,20 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".setting.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".CheckTicketActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme">
-
-            <!-- Parent activity meta-data to support 4.0 and lower -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.zjl.checkticket.CheckTicketActivity" />
         </activity>
         <activity
             android:name=".statistics.StatisticsActivity"
             android:label="@string/title_activity_statistics"
-            android:parentActivityName=".CheckTicketActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.zjl.checkticket.CheckTicketActivity" />
         </activity>
     </application>
 

@@ -21,5 +21,7 @@ public class SyncTicketsRequest extends CommonRequest {
         RequestBody requestBody = RequestBody.create(HttpConstants.MEDIA_TYPE_JSON, jsonBody);
 
         request = new Request.Builder().url(url).post(requestBody).build();
+
+        blockIfSessionExpired = true;
     }
 }

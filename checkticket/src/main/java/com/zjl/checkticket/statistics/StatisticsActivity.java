@@ -1,5 +1,15 @@
 package com.zjl.checkticket.statistics;
 
+import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
+
 import com.zjl.checkticket.LoginActivity;
 import com.zjl.checkticket.R;
 import com.zjl.checkticket.TicketDataManager;
@@ -7,15 +17,6 @@ import com.zjl.checkticket.account.AccountManager;
 import com.zjl.checkticket.db.CheckTicketContract;
 import com.zjl.checkticket.db.CheckTicketDAO;
 import com.zjl.checkticket.model.Ticket;
-
-import android.content.Intent;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.View;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -33,9 +34,7 @@ public class StatisticsActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        // TODO: 16/6/18 this will cause the CheckTicketActivity been destroyed and recreated.
-        // getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mInfoTv = (TextView) findViewById(R.id.info_tv);
         mInfoTv.setText(getString(R.string.statistics_info, 0, 0));
@@ -67,6 +66,17 @@ public class StatisticsActivity extends AppCompatActivity {
         if (requestCode == REQUEST_LOGIN_CODE && resultCode == RESULT_OK) {
             TicketDataManager.getInstance().syncTickets();
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Log.d(TAG, "onOptionsItemSelected: ");
+        int id = item.getItemId();
+        if (id == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
